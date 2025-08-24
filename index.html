@@ -42,7 +42,6 @@
         .screen { animation: fadeIn 0.5s ease-out forwards; }
         .slide-in-up { animation: slideInUp 0.5s ease-out forwards; }
         
-        /* REQUISITO 1: Fundo do Jogo Atualizado */
         .bg-stadium {
             background: linear-gradient(rgba(17, 24, 39, 0.85), rgba(17, 24, 39, 0.85)), url('https://i.imgur.com/9g5W2Qe.jpeg');
             background-size: cover;
@@ -71,21 +70,24 @@
         .fitness-bar-bg { background-color: #374151; }
         .fitness-bar { background-color: #10b981; }
 
-        /* REQUISITO 2: Orientação Mobile */
+        /* REQUISITO 1: Tela de Girar o Celular (Atualizado) */
         #orientation-overlay {
-            display: none; /* Oculto por padrão */
+            display: none;
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.95);
-            color: white;
-            z-index: 100;
+            background-color: #000;
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            padding: 20px;
         }
+        #orientation-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Apenas exibe a tela de orientação em modo retrato em dispositivos móveis */
         @media screen and (max-width: 768px) and (orientation: portrait) {
-            #game-container {
+            #game-container, footer {
                 display: none;
             }
             #orientation-overlay {
@@ -95,13 +97,9 @@
     </style>
 </head>
 <body class="dark-mode min-h-screen">
-    <!-- REQUISITO 2: Overlay de Orientação -->
+    <!-- REQUISITO 1: Overlay de Orientação com Imagem Estática -->
     <div id="orientation-overlay">
-        <div class="flex flex-col items-center">
-            <svg class="w-16 h-16 mb-4 text-blue-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5"></path></svg>
-            <h2 class="text-2xl font-bold">Por favor, gire seu dispositivo</h2>
-            <p class="mt-2 text-lg">Este jogo foi projetado para a visualização em modo horizontal.</p>
-        </div>
+        <img id="orientation-image" src="https://i.imgur.com/LGK2wCs.jpeg" alt="Vire o dispositivo para a horizontal">
     </div>
 
     <div id="game-container" class="max-w-7xl mx-auto p-2 sm:p-4">
@@ -114,7 +112,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
                     <button onclick="showScreen('career-mode')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-trophy mr-2"></i> Modo Carreira</button>
                     <button onclick="showScreen('competitions')" class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-list-ol mr-2"></i> Competições</button>
-                    <button onclick="showScreen('transfers')" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-exchange-alt mr-2"></i> Contratar</button>
+                    <!-- REQUISITO 5: Botão "Loja" -->
+                    <button onclick="showScreen('shop')" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-store mr-2"></i> Loja</button>
                     <button onclick="openModal('settings-modal')" class="bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-cog mr-2"></i> Configurações</button>
                 </div>
             </div>
@@ -138,8 +137,13 @@
                     </div>
                     <div class="text-sm">
                         <p>V-Coins: <span id="budget-display" class="font-bold text-green-400"></span></p>
-                        <p>Salários/Rodada: <span id="payroll-display" class="font-bold text-red-400"></span></p>
+                        <p>Patrocínio: <span id="sponsorship-display" class="font-bold text-blue-400">LUCCABET</span></p>
                     </div>
+                     <!-- REQUISITO 14: Botão de Mensagens -->
+                    <button onclick="showScreen('messages')" class="relative bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg text-sm">
+                        <i class="fas fa-envelope mr-1"></i> Mensagens
+                        <span id="message-notification" class="hidden absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"></span>
+                    </button>
                     <button onclick="showScreen('main-menu')" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm"><i class="fas fa-sign-out-alt mr-1"></i> Menu</button>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -149,7 +153,7 @@
                             <div id="next-match-card"></div>
                             <div id="match-buttons" class="mt-4 grid grid-cols-2 gap-2">
                                 <button onclick="playNextMatch()" class="bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg text-sm font-semibold w-full transition-transform transform hover:scale-105">Jogar <i class="fas fa-play ml-1"></i></button>
-                                <button onclick="simulateRound()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm font-semibold w-full transition-transform transform hover:scale-105">Simular Rodada <i class="fas fa-forward ml-1"></i></button>
+                                <button onclick="simulateRound()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm font-semibold w-full transition-transform transform hover:scale-105">Simulação Rápida <i class="fas fa-forward ml-1"></i></button>
                             </div>
                         </div>
                         <div class="bg-card rounded-xl p-4 shadow-lg border border-custom">
@@ -160,7 +164,6 @@
                                 <button onclick="showScreen('transfers')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-exchange-alt w-6 text-center mr-2"></i> Transferências</button>
                                 <button onclick="showScreen('finances')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-landmark w-6 text-center mr-2"></i> Finanças e Clube</button>
                                 <button onclick="showScreen('calendar')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-calendar-alt w-6 text-center mr-2"></i> Calendário</button>
-                                <!-- REQUISITO 5: Jornais "CBFD NEWS" -->
                                 <button onclick="showScreen('newspapers')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-newspaper w-6 text-center mr-2"></i> CBFD NEWS</button>
                             </div>
                         </div>
@@ -180,7 +183,7 @@
                                 <tbody id="league-table-body"></tbody>
                             </table>
                         </div>
-                         <button onclick="showScreen('league-table')" class="text-blue-400 text-sm mt-2 hover:underline">Ver tabela completa</button>
+                         <button onclick="showScreen('league-table')" class="text-blue-400 text-sm mt-2 hover:underline">Ver tabela e artilheiros</button>
                     </div>
                 </div>
             </div>
@@ -190,7 +193,6 @@
         <div id="newspapers" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
-                <!-- REQUISITO 5: Título do Jornal -->
                 <h2 class="text-3xl font-bold">CBFD NEWS</h2>
                 <div></div>
             </div>
@@ -199,28 +201,67 @@
             </div>
         </div>
         
-        <!-- REQUISITO 4: Tela de Finanças e Clube -->
+        <!-- REQUISITO 14: Tela de Mensagens -->
+        <div id="messages" class="screen hidden">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
+                <h2 class="text-3xl font-bold">Caixa de Entrada</h2>
+                <div></div>
+            </div>
+            <div id="messages-feed" class="bg-card rounded-xl p-4 border border-custom space-y-4 max-h-[70vh] overflow-y-auto">
+                <p class="text-muted">Nenhuma mensagem recebida.</p>
+            </div>
+        </div>
+
+        <!-- REQUISITO 6: Tela de Finanças e Clube (Atualizada) -->
         <div id="finances" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
                 <h2 class="text-3xl font-bold">Finanças e Estrutura</h2>
                 <div></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-card rounded-xl p-6 border border-custom">
-                    <h3 class="text-xl font-semibold mb-4">Estádio</h3>
-                    <div class="space-y-3">
-                        <p>Nível Atual: <span id="stadium-level" class="font-bold">1</span></p>
-                        <p>Capacidade: <span id="stadium-capacity" class="font-bold">10.000</span> torcedores</p>
-                        <p>Receita por Jogo (casa): ~<span id="stadium-revenue" class="font-bold text-green-400">150.000</span></p>
-                    </div>
-                    <button id="upgrade-stadium-button" onclick="upgradeStadium()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
-                        Ampliar Estádio (<span id="upgrade-stadium-cost"></span> V-Coins)
-                    </button>
-                </div>
-                <div class="bg-card rounded-xl p-6 border border-custom">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-card rounded-xl p-6 border border-custom lg:col-span-1">
                     <h3 class="text-xl font-semibold mb-4">Estrutura do Clube</h3>
-                    <div id="bus-status"></div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold">Estádio</h4>
+                            <p class="text-sm text-muted">Nível: <span id="stadium-level" class="font-bold">1</span> | Capacidade: <span id="stadium-capacity" class="font-bold">10.000</span></p>
+                            <button id="upgrade-stadium-button" onclick="upgradeStadium()" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                                Ampliar (<span id="upgrade-stadium-cost"></span>)
+                            </button>
+                        </div>
+                        <div id="bus-status"></div>
+                        <div>
+                            <h4 class="font-semibold">Patrocínios</h4>
+                            <div id="sponsorships-details" class="text-sm text-muted">Verificando propostas...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-card rounded-xl p-6 border border-custom lg:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4">Relatório Financeiro</h3>
+                    <div id="financial-report" class="space-y-3 text-sm max-h-64 overflow-y-auto">
+                        <p class="text-muted">Nenhuma transação registrada nesta temporada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REQUISITO 5: Tela da Loja -->
+        <div id="shop" class="screen hidden">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="gameState.userTeam ? showScreen('career-mode') : showScreen('main-menu')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
+                <h2 class="text-3xl font-bold">Loja</h2>
+                <div></div>
+            </div>
+            <div class="bg-card rounded-xl p-8 border border-custom text-center">
+                <i class="fas fa-tools text-5xl text-yellow-500 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Loja em Obras!</h3>
+                <p class="text-muted mb-6">Nossa loja com itens exclusivos e V-Coins (com preços em R$) está em desenvolvimento. Volte em breve!</p>
+                <div class="border-t border-custom pt-6">
+                    <h4 class="text-xl font-semibold">Apoie o Projeto</h4>
+                    <p class="text-muted my-2">Considere fazer uma doação para nos ajudar a continuar desenvolvendo o CBFD 25!</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg opacity-50 cursor-not-allowed">Fazer Doação (Em Breve)</button>
                 </div>
             </div>
         </div>
@@ -261,22 +302,35 @@
             </div>
             <div id="competitions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
+        
+        <!-- REQUISITO 11: Calendário -->
         <div id="calendar" class="screen hidden">
              <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
-                <h2 class="text-3xl font-bold">Calendário</h2>
+                <h2 class="text-3xl font-bold">Calendário da Temporada</h2>
                 <div></div>
             </div>
             <div id="calendar-view" class="bg-card rounded-xl p-4 border border-custom max-h-[80vh] overflow-y-auto"></div>
         </div>
+        
+        <!-- REQUISITO 10: Tabela e Artilheiros -->
         <div id="league-table" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
                 <h2 class="text-3xl font-bold">Tabela - League One</h2>
                 <div></div>
             </div>
-            <div class="bg-card rounded-xl p-4 overflow-x-auto border border-custom"><table id="full-league-table-element" class="w-full text-sm"></table></div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-card rounded-xl p-4 overflow-x-auto border border-custom">
+                    <table id="full-league-table-element" class="w-full text-sm"></table>
+                </div>
+                <div class="lg:col-span-1 bg-card rounded-xl p-4 border border-custom">
+                    <h3 class="text-lg font-semibold mb-3">Artilheiros</h3>
+                    <div id="top-scorers-list" class="space-y-2 text-sm max-h-96 overflow-y-auto"></div>
+                </div>
+            </div>
         </div>
+
         <div id="team-management" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
@@ -288,10 +342,12 @@
                 <div class="bg-card rounded-xl p-4 border border-custom"><h3 class="font-semibold mb-3 text-lg">Reservas</h3><div id="substitutes-list" class="space-y-2"></div></div>
             </div>
         </div>
+        
+        <!-- REQUISITO 10: Transferências (Atualizado) -->
         <div id="transfers" class="screen hidden">
              <div class="flex justify-between items-center mb-6">
                 <button onclick="gameState.userTeam ? showScreen('career-mode') : showScreen('main-menu')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
-                <h2 class="text-3xl font-bold">Mercado</h2>
+                <h2 class="text-3xl font-bold">Mercado de Transferências</h2>
                 <div class="text-sm text-right">
                     <p>V-Coins: <span id="budget-display-transfer" class="font-bold text-green-400"></span></p>
                 </div>
@@ -303,8 +359,8 @@
                             <th class="p-2">Nome</th>
                             <th class="p-2">Pos.</th>
                             <th class="p-2 text-center">OVR</th>
+                            <th class="p-2">Clube</th>
                             <th class="p-2">Valor</th>
-                            <th class="p-2">Salário</th>
                             <th class="p-2 text-center">Ação</th>
                         </tr>
                     </thead>
@@ -332,28 +388,62 @@
     </div>
 
     <!-- Modais -->
-    <div id="quick-sim-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom">
-            <h3 class="text-2xl font-bold mb-4">Resultado da Partida</h3><p id="quick-sim-result" class="text-xl mb-6"></p>
-            <button onclick="closeModal('quick-sim-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">Fechar</button>
+    <div id="quick-sim-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div id="quick-sim-content" class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-lg">
+            <!-- Conteúdo será injetado dinamicamente -->
         </div>
     </div>
     <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
          <div class="bg-card rounded-xl p-8 shadow-2xl slide-in-up border border-custom w-full max-w-md">
             <h3 class="text-2xl font-bold mb-6">Configurações</h3>
             <div class="space-y-4">
-                <div class="flex items-center justify-between"><span class="text-sm font-medium">Modo de Cor</span><button id="theme-toggle-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Alternar</button></div>
+                <div class="flex items-center justify-between"><span class="text-lg font-medium">Modo de Cor</span><button id="theme-toggle-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Alternar</button></div>
+                <!-- REQUISITO 13: Salvar Automático -->
+                <div class="flex items-center justify-between pt-4 border-t border-custom">
+                    <label for="autosave-checkbox" class="text-lg font-medium">Salvar Automático</label>
+                    <input type="checkbox" id="autosave-checkbox" onchange="toggleAutoSave(this.checked)" class="w-6 h-6 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                </div>
                 <button onclick="resetProgress()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg mt-4">Resetar Progresso</button>
             </div>
             <button onclick="closeModal('settings-modal')" class="absolute top-4 right-4 text-2xl text-muted hover:text-white">&times;</button>
         </div>
     </div>
-    <div id="end-of-season-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom">
-            <h3 class="text-2xl font-bold mb-4">Fim da Temporada!</h3><div id="end-of-season-summary" class="text-lg mb-6"></div>
+    
+    <!-- REQUISITO 4: Modal de Fim de Temporada com Premiações -->
+    <div id="end-of-season-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-lg">
+            <h3 class="text-3xl font-bold mb-4">🏆 Fim da Temporada! 🏆</h3>
+            <div id="end-of-season-summary" class="text-lg mb-6 space-y-3"></div>
             <button onclick="startNewSeason()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg">Iniciar Nova Temporada</button>
         </div>
     </div>
+    
+    <!-- REQUISITO 4: Modal do Torneio de Elite -->
+    <div id="elite-tournament-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-md">
+            <h3 class="text-2xl font-bold mb-2">👑 Convite Especial! 👑</h3>
+            <p class="text-yellow-400 font-semibold mb-4">TORNEIO DE ELITE CBFD</p>
+            <p class="mb-6">Sua equipe foi convidada para o torneio de pré-temporada mais prestigiado! O campeão leva tudo. Deseja participar?</p>
+            <p class="mb-6 font-bold">Custo de Inscrição: 25.000.000 V-Coins</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="handleEliteTournament(false)" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">Recusar</button>
+                <button onclick="handleEliteTournament(true)" id="accept-tournament-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg">Aceitar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REQUISITO 9: Modal de Dificuldade -->
+    <div id="difficulty-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-sm">
+            <h3 class="text-2xl font-bold mb-4">Escolha a Dificuldade</h3>
+            <div class="space-y-3">
+                <button onclick="setDifficulty('easy')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg">Fácil</button>
+                <button onclick="setDifficulty('normal')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">Normal</button>
+                <button onclick="setDifficulty('goat')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg">GOAT 🐐</button>
+            </div>
+        </div>
+    </div>
+
     <div id="substitution-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div class="bg-card rounded-xl shadow-2xl slide-in-up border border-custom w-full max-w-3xl">
             <h3 class="text-xl font-bold p-4 border-b border-custom">Substituição</h3>
@@ -372,7 +462,7 @@
             </div>
         </div>
     </div>
-    <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom max-w-sm">
             <h3 id="message-modal-title" class="text-2xl font-bold mb-4">Aviso</h3>
             <p id="message-modal-text" class="text-lg mb-6"></p>
@@ -380,10 +470,17 @@
         </div>
     </div>
 
+    <!-- REQUISITO 12: Rodapé (Créditos) -->
+    <footer class="text-center text-xs text-muted py-4 mt-8 border-t border-custom">
+        <p><strong>Dono e Programador:</strong> @luccaburrows_</p>
+        <p><strong>Designer e Chefe da Equipe de Designer:</strong> @destroyl6, @vetvelboy, @otremclaudinn_, @vvzmidia</p>
+        <p class="mt-2">CBFD 25 Football Manager &copy; 2024-2025</p>
+    </footer>
+
 
 <script>
 // ===================================================================================
-// JOGO CBFD 25 - LÓGICA PRINCIPAL (v6.1 - Atualização de Conteúdo)
+// JOGO CBFD 25 - LÓGICA PRINCIPAL (v7.0 - Grande Atualização)
 // ===================================================================================
 
 // -----------------------------------------------------------------------------------
@@ -412,7 +509,6 @@ let substitutionState = {
 // -----------------------------------------------------------------------------------
 const firstNames = ["Carlos", "Bruno", "Gabriel", "Lucas", "Matheus", "Rafael", "Thiago", "Diego", "Felipe", "Gustavo", "João", "Pedro", "Marcos", "Daniel", "Eduardo"];
 const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Lima", "Pereira", "Ferreira", "Costa", "Gomes", "Martins", "Alves", "Ribeiro", "Carvalho", "Rodrigues", "Melo"];
-// Posições atualizadas para incluir as novas dos elencos
 const positions = {
     "GOL": ["GOL"],
     "DEF": ["ZAG", "DC", "LD", "LE"],
@@ -434,13 +530,11 @@ const cbfdTeams = [
     { name: "Real Vila", logo: 'RV', colors: ['#1d4ed8', '#ffffff'] }, { name: "Vila Nova", logo: 'VN', colors: ['#b91c1c', '#ffffff'] }
 ];
 
-// REQUISITO 6: Elencos Atualizados
 const fcVencedoresRoster = [
     { name: "Weverton", position: "GOL" }, { name: "Alexsander Burrows", position: "LD" }, { name: "Victor Jr", position: "DC" },
     { name: "Vitor Reis", position: "DC" }, { name: "João Costa", position: "LE" }, { name: "Hypervenom", position: "VOL" },
     { name: "Claudinho", position: "MC" }, { name: "Martim Jr", position: "MAT" }, { name: "Gonga", position: "EE" },
     { name: "Murilo", position: "PL" }, { name: "Miguel Moura", position: "ED" },
-    // Reservas genéricos
     { name: "G. Aranha", position: "GOL" }, { name: "L. Farias", position: "LD" }, { name: "E. Santos", position: "DC" },
     { name: "R. Dias", position: "LE" }, { name: "T. Mendes", position: "VOL" }, { name: "F. Augusto", position: "MC" },
     { name: "K. Paiva", position: "MAT" }, { name: "D. Barros", position: "PL" }
@@ -450,7 +544,6 @@ const bayernDeMilaoRoster = [
     { name: "A. Costa", position: "LD" }, { name: "Kendry", position: "VOL" }, { name: "Felipe", position: "VOL" },
     { name: "Bielzin", position: "ME" }, { name: "Zlatan", position: "MD" }, { name: "Frost", position: "PE" },
     { name: "Alvarez", position: "CA" }, { name: "Bryan", position: "PD" },
-    // Reservas genéricos
     { name: "F. Gomes", position: "GOL" }, { name: "J. Vieira", position: "ZAG" }, { name: "D. Almeida", position: "VOL" },
     { name: "L. Martins", position: "ME" }, { name: "G. Rocha", position: "PE" }, { name: "M. Castro", position: "CA" }
 ];
@@ -459,7 +552,6 @@ const kidsFcRoster = [
     { name: "Murilinho", position: "ZAG" }, { name: "Isco", position: "LD" }, { name: "Ruiz", position: "MCD" },
     { name: "Wirtz", position: "MAT" }, { name: "Lois", position: "MCD" }, { name: "Lian", position: "PE" },
     { name: "Christian", position: "CA" }, { name: "Kevin", position: "PD" },
-    // Reservas genéricos
     { name: "Y. Ferreira", position: "GOL" }, { name: "B. Cardoso", position: "ZAG" }, { name: "I. Lopes", position: "MCD" },
     { name: "V. Nogueira", position: "MAT" }, { name: "E. Ramos", position: "PE" }, { name: "A. Pinto", position: "CA" }
 ];
@@ -472,10 +564,9 @@ const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) +
 const formatCurrency = (value) => `${value.toLocaleString('pt-BR')} V-Coins`;
 const getTeamLogoSVG = (logoText, color1, color2, className = 'team-badge') => `<svg class="${className}" viewBox="0 0 36 36"><circle cx="18" cy="18" r="17" fill="${color1}" stroke="${color2}" stroke-width="2"/><text x="18" y="23" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="bold" fill="${color2}">${logoText}</text></svg>`;
 
-function generatePlayer(id, pos) {
+function generatePlayer(id, pos, teamName = "Agente Livre") {
     const overall = getRandomInt(50, 85);
     const marketValue = Math.round((Math.pow(overall / 10, 2)) * getRandomInt(8, 12) * 1000);
-    const salary = Math.round(marketValue / getRandomInt(80, 120));
     return { 
         id, 
         name: `${getRandom(firstNames)} ${getRandom(lastNames)}`, 
@@ -483,15 +574,16 @@ function generatePlayer(id, pos) {
         position: pos || getRandom(allPositions), 
         overall, 
         marketValue,
-        salary,
+        teamName,
         morale: 75,
         fitness: 100,
         suspended: 0,
+        injuryProne: Math.random() < 0.1, // 10% de chance de ser propenso a lesões
         stats: { 
             attack: getRandomInt(overall-10, overall+10), 
             defense: getRandomInt(overall-10, overall+10) 
         },
-        seasonGoals: 0, seasonAssists: 0, seasonCleanSheets: 0, seasonMatches: 0, seasonRating: []
+        seasonGoals: 0, seasonAssists: 0, seasonMatches: 0
     };
 }
 
@@ -505,13 +597,13 @@ function generateTeam(teamData) {
 
     if (rosterToUse) {
         players = rosterToUse.map((p, i) => {
-            const player = generatePlayer(gameState.nextPlayerId + i, p.position);
+            const player = generatePlayer(gameState.nextPlayerId + i, p.position, teamData.name);
             player.name = p.name;
-            player.overall += 10; // Boost para times customizados
+            player.overall += 10;
             return player;
         });
     } else {
-        players = Array.from({ length: 22 }, (_, i) => generatePlayer(gameState.nextPlayerId + i));
+        players = Array.from({ length: 22 }, (_, i) => generatePlayer(gameState.nextPlayerId + i, null, teamData.name));
     }
     
     return { 
@@ -520,41 +612,48 @@ function generateTeam(teamData) {
         colors: teamData.colors, 
         logoText: teamData.logo, 
         players, 
-        isUserTeam: false 
+        isUserTeam: false,
+        fanBase: getRandomInt(20000, 100000) // REQUISITO 8
     };
 }
 
 function initGame(isNewGame = true) {
     if (isNewGame) {
         gameState = {
+            version: "7.0",
             season: 2025, userTeam: null, nextPlayerId: 1,
-            teams: [],
+            difficulty: 'normal',
             budget: 5000000,
-            payroll: 0,
-            // REQUISITO 4: Economia - Estado inicial
             stadium: { level: 1, capacity: 10000 },
             club: { hasBus: false },
             tactics: { formation: '4-4-2', style: 'equilibrado' },
             news: [],
+            messages: [],
+            transactions: [],
+            sponsorship: {
+                main: { name: "LUCCABET", value: 500000 },
+                secondary: null
+            },
+            settings: {
+                autoSave: false
+            },
             competitions: {
-                'CBFD League One': { schedule: [], table: [], currentRound: 0, winner: null },
+                'CBFD League One': { schedule: [], table: [], topScorers: [], currentRound: 0, winner: null },
             },
             calendar: [],
-            transferMarket: Array.from({ length: 100 }, () => generatePlayer(0))
         };
         gameState.teams = cbfdTeams.map(teamData => {
             const team = generateTeam(teamData);
             gameState.nextPlayerId += team.players.length;
             return team;
         });
-        gameState.transferMarket.forEach(p => p.id = gameState.nextPlayerId++);
         generateAllSchedules();
     }
     updateAllTables();
     renderTeamSelection();
     renderCompetitionsScreen();
-    renderTransfers();
-    document.getElementById('load-game-button').style.display = localStorage.getItem('cbfd25_save_v6') ? 'inline-block' : 'none';
+    document.getElementById('load-game-button').style.display = localStorage.getItem('cbfd25_save_v7') ? 'inline-block' : 'none';
+    document.getElementById('autosave-checkbox').checked = gameState.settings.autoSave;
     showScreen('main-menu');
 }
 
@@ -595,7 +694,13 @@ function generateLeagueSchedule(compKey, teams) {
 }
 
 function generateFullCalendar() {
-    gameState.calendar = gameState.competitions['CBFD League One'].schedule || [];
+    // REQUISITO 11: Adiciona datas fictícias
+    const startDate = new Date(gameState.season, 1, 15); // Inicia em 15 de Fevereiro
+    let currentDate = startDate;
+    gameState.calendar = gameState.competitions['CBFD League One'].schedule.map((roundData, index) => {
+        currentDate.setDate(currentDate.getDate() + (index % 2 === 0 ? 3 : 4)); // Jogos a cada 3-4 dias
+        return { ...roundData, date: new Date(currentDate) };
+    });
 }
 
 function updateAllTables() {
@@ -607,8 +712,10 @@ function updateLeagueTable(compKey) {
     if (!comp) return;
 
     const table = {};
+    const allPlayers = [];
     gameState.teams.forEach(team => {
         table[team.name] = { name: team.name, logo: team.logo, p: 0, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0 };
+        allPlayers.push(...team.players);
     });
 
     comp.schedule.forEach(round => round.matches.forEach(match => {
@@ -624,6 +731,12 @@ function updateLeagueTable(compKey) {
     }));
     Object.values(table).forEach(t => t.sg = t.gp - t.gc);
     comp.table = Object.values(table).sort((a, b) => b.p - a.p || b.sg - a.sg || b.gp - a.gp || a.name.localeCompare(b.name));
+    
+    // REQUISITO 10: Atualiza artilheiros
+    comp.topScorers = allPlayers
+        .filter(p => p.seasonGoals > 0)
+        .sort((a, b) => b.seasonGoals - a.seasonGoals || a.seasonMatches - b.seasonMatches)
+        .slice(0, 15);
 }
 
 // -----------------------------------------------------------------------------------
@@ -650,17 +763,25 @@ function showScreen(screenId) {
     else if (screenId === 'tactics') renderTactics();
     else if (screenId === 'newspapers') renderNewspapers();
     else if (screenId === 'finances') renderFinances();
+    else if (screenId === 'messages') renderMessages();
 }
 
 function updateCareerDashboard() {
     if (!gameState.userTeam) return;
-    const userTeam = findTeam(gameState.userTeam);
-    gameState.payroll = userTeam.players.reduce((acc, p) => acc + p.salary, 0);
 
     document.getElementById('user-team-name').innerText = gameState.userTeam;
     document.getElementById('current-season').innerText = gameState.season;
     document.getElementById('budget-display').innerText = formatCurrency(gameState.budget);
-    document.getElementById('payroll-display').innerText = formatCurrency(gameState.payroll);
+    
+    // REQUISITO 14: Notificação de Mensagens
+    const unreadMessages = gameState.messages.filter(m => !m.read).length;
+    const notification = document.getElementById('message-notification');
+    if (unreadMessages > 0) {
+        notification.innerText = unreadMessages;
+        notification.classList.remove('hidden');
+    } else {
+        notification.classList.add('hidden');
+    }
     
     renderLeagueTable();
     
@@ -670,7 +791,7 @@ function updateCareerDashboard() {
     if (nextMatch) {
         const homeTeam = findTeam(nextMatch.match.home);
         const awayTeam = findTeam(nextMatch.match.away);
-        nextMatchCard.innerHTML = `<p class="text-center text-muted text-sm mb-2">${nextMatch.round.type} - ${nextMatch.round.round}</p>
+        nextMatchCard.innerHTML = `<p class="text-center text-muted text-sm mb-2">${nextMatch.round.type} - ${nextMatch.round.round} (${nextMatch.round.date.toLocaleDateString('pt-BR')})</p>
             <div class="flex items-center justify-between">
                 <div class="text-center w-1/3"><div class="mx-auto">${homeTeam.logo}</div><p class="text-xs mt-1 font-semibold">${homeTeam.name}</p></div>
                 <p class="text-2xl font-bold">vs</p>
@@ -695,19 +816,18 @@ function getTeamStrength(team, players) {
     let baseDefense = 0;
     
     currentPlayers.forEach(p => {
+        if (p.suspended > 0) return;
         const moraleFactor = p.morale / 100;
         const fitnessFactor = (p.fitness / 100) * 0.7 + 0.3;
         const effectiveOverall = p.overall * moraleFactor * fitnessFactor;
 
-        if (p.suspended > 0) return;
-
-        if (Object.keys(positions).find(k => positions[k].includes(p.position)) === 'ATA') {
+        if (positions.ATA.includes(p.position)) {
             baseAttack += effectiveOverall;
             baseDefense += effectiveOverall * 0.2;
-        } else if (Object.keys(positions).find(k => positions[k].includes(p.position)) === 'MEI') {
+        } else if (positions.MEI.includes(p.position)) {
             baseAttack += effectiveOverall * 0.8;
             baseDefense += effectiveOverall * 0.6;
-        } else if (Object.keys(positions).find(k => positions[k].includes(p.position)) === 'DEF') {
+        } else if (positions.DEF.includes(p.position)) {
             baseAttack += effectiveOverall * 0.3;
             baseDefense += effectiveOverall;
         } else { // GOL
@@ -731,47 +851,44 @@ function getTeamStrength(team, players) {
     };
 }
 
-// REQUISITO 3: Simulação Rápida (Correção)
 function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
     const homeStarters = homeTeam.players.slice(0, 11).map(p => ({...p, teamName: homeTeam.name}));
     const awayStarters = awayTeam.players.slice(0, 11).map(p => ({...p, teamName: awayTeam.name}));
     const events = [];
     let homeGoals = 0, awayGoals = 0;
     
-    // Para simulação rápida, usamos uma lógica mais direta e aleatória
-    if (isQuickSim) {
-        const homeStrength = getTeamStrength(homeTeam, homeStarters);
-        const awayStrength = getTeamStrength(awayTeam, awayStarters);
+    const homeStrength = getTeamStrength(homeTeam, homeStarters);
+    const awayStrength = getTeamStrength(awayTeam, awayStarters);
 
+    // Dificuldade afeta a força do oponente
+    if (homeTeam.isUserTeam && gameState.difficulty === 'goat') awayStrength.attack *= 1.1;
+    if (awayTeam.isUserTeam && gameState.difficulty === 'goat') homeStrength.attack *= 1.1;
+    if (homeTeam.isUserTeam && gameState.difficulty === 'easy') awayStrength.attack *= 0.9;
+    if (awayTeam.isUserTeam && gameState.difficulty === 'easy') homeStrength.attack *= 0.9;
+
+    if (isQuickSim) {
         const totalStrength = homeStrength.attack + awayStrength.attack;
         const homeWinChance = homeStrength.attack / totalStrength;
-        
-        // Adiciona um fator de aleatoriedade para evitar resultados previsíveis
-        const randomFactor = (Math.random() - 0.5) * 0.2; // Variação de -10% a +10%
+        const randomFactor = (Math.random() - 0.5) * 0.2;
         const finalHomeWinChance = homeWinChance + randomFactor;
-
         const outcome = Math.random();
         
-        if (outcome < finalHomeWinChance - 0.2) { // Vitória do time da casa
+        if (outcome < finalHomeWinChance - 0.2) {
             homeGoals = getRandomInt(1, 4);
             awayGoals = getRandomInt(0, homeGoals - 1);
-        } else if (outcome > finalHomeWinChance + 0.2) { // Vitória do visitante
+        } else if (outcome > finalHomeWinChance + 0.2) {
             awayGoals = getRandomInt(1, 4);
             homeGoals = getRandomInt(0, awayGoals - 1);
-        } else { // Empate
+        } else {
             homeGoals = getRandomInt(0, 3);
             awayGoals = homeGoals;
         }
         
-        // Gera eventos de gol para consistência
         for(let i=0; i<homeGoals; i++) events.push({ type: 'goal', team: homeTeam.name, playerId: getRandom(homeStarters).id });
         for(let i=0; i<awayGoals; i++) events.push({ type: 'goal', team: awayTeam.name, playerId: getRandom(awayStarters).id });
 
-    } else { // Simulação narrada (lógica original mantida)
+    } else {
         for (let minute = 1; minute <= 90; minute++) {
-            const homeStrength = getTeamStrength(homeTeam, homeStarters);
-            const awayStrength = getTeamStrength(awayTeam, awayStarters);
-            
             const homeAttackPower = Math.max(0, homeStrength.attack - awayStrength.defense);
             if (Math.random() < homeAttackPower / 1500) {
                 homeGoals++;
@@ -796,8 +913,13 @@ function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
             }
             if (Math.random() < 0.005) {
                  const player = getRandom([...homeStarters, ...awayStarters]);
-                 const turns = getRandomInt(1, 3);
-                 events.push({ minute, type: 'injury', team: player.teamName, player: player.name, playerId: player.id, turns });
+                 if (player.injuryProne && Math.random() < 0.5) { // Maior chance se propenso
+                    const turns = getRandomInt(2, 4);
+                    events.push({ minute, type: 'injury', team: player.teamName, player: player.name, playerId: player.id, turns });
+                 } else {
+                    const turns = getRandomInt(1, 2);
+                    events.push({ minute, type: 'injury', team: player.teamName, player: player.name, playerId: player.id, turns });
+                 }
             }
         }
     }
@@ -809,7 +931,7 @@ function startNarratedSimulation(matchData) {
     const homeTeam = findTeam(matchData.match.home);
     const awayTeam = findTeam(matchData.match.away);
 
-    const matchResult = simulateMatch(homeTeam, awayTeam, false); // false para simulação narrada
+    const matchResult = simulateMatch(homeTeam, awayTeam, false);
     simulationState = {
         interval: null, minute: 0, paused: false, matchData,
         homeTeam, awayTeam,
@@ -986,7 +1108,7 @@ function simulateRound() {
     }
     
     const { round } = nextMatchData;
-    const wasSimulated = executeRoundSimulation(round, true); // true para quickSim
+    const wasSimulated = executeRoundSimulation(round, true);
 
     if (wasSimulated) {
         processRoundEnd(round);
@@ -998,7 +1120,12 @@ function simulateRound() {
     const userMatch = round.matches.find(m => m.home === gameState.userTeam || m.away === gameState.userTeam);
     if (userMatch) {
          const resultText = `${userMatch.home} ${userMatch.result[0]} x ${userMatch.result[1]} ${userMatch.away}`;
-         document.getElementById('quick-sim-result').innerText = resultText;
+         const content = `
+            <h3 class="text-2xl font-bold mb-4">Resultado da Partida</h3>
+            <p class="text-xl mb-6">${resultText}</p>
+            <button onclick="closeModal('quick-sim-modal'); showNewsAfterMatch()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">Ver Notícias</button>
+         `;
+         document.getElementById('quick-sim-content').innerHTML = content;
          openModal('quick-sim-modal');
     }
 }
@@ -1008,10 +1135,17 @@ function finishMatch() {
     const { homeGoals, awayGoals, matchData, homeTeam, awayTeam, events } = simulationState;
     matchData.match.result = [homeGoals, awayGoals];
     processMatchEvents(homeTeam, awayTeam, events);
-    executeRoundSimulation(matchData.round, true); // Simula o resto da rodada rapidamente
+    executeRoundSimulation(matchData.round, true);
     processRoundEnd(matchData.round);
     updateAllTables();
     showScreen('career-mode');
+    
+    // REQUISITO 2: Exibir jornal após a partida
+    showNewsAfterMatch();
+}
+
+function showNewsAfterMatch() {
+    showScreen('newspapers');
 }
 
 function executeRoundSimulation(round, isQuickSim) {
@@ -1070,20 +1204,29 @@ function processRoundEnd(round) {
         let income = 0;
         const isHome = userMatch.home === gameState.userTeam;
         
-        // REQUISITO 4: Receita de torcedores
         if (isHome) {
             const ticketPrice = 15;
-            income += gameState.stadium.capacity * ticketPrice;
+            const attendance = Math.floor(gameState.stadium.capacity * (getRandomInt(75, 100) / 100));
+            const ticketRevenue = attendance * ticketPrice;
+            income += ticketRevenue;
+            addTransaction(`Receita de bilheteria vs ${userMatch.away}`, ticketRevenue, 'income');
         }
 
         const result = userMatch.result;
         if ((isHome && result[0] > result[1]) || (!isHome && result[1] > result[0])) {
-            income += 100000; // Prêmio por vitória
+            income += 100000;
+            addTransaction('Prêmio por vitória na liga', 100000, 'income');
         } else if (result[0] === result[1]) {
-            income += 25000; // Prêmio por empate
+            income += 25000;
+            addTransaction('Prêmio por empate na liga', 25000, 'income');
         }
         gameState.budget += income;
-        gameState.budget -= gameState.payroll;
+
+        // Despesas com salários (movido para cá para ser por rodada)
+        const userTeamData = findTeam(gameState.userTeam);
+        const payroll = userTeamData.players.reduce((acc, p) => acc + (p.marketValue / 100), 0);
+        gameState.budget -= payroll;
+        addTransaction('Pagamento de salários (rodada)', payroll, 'expense');
     }
 
     gameState.teams.forEach(team => {
@@ -1094,17 +1237,35 @@ function processRoundEnd(round) {
         });
     });
 
-    // REQUISITO 5: Gerar notícia do CBFD NEWS
+    // REQUISITO 2 & 3: Gerar notícia e evento aleatório
     generateCbfdNews(round);
+    triggerRandomEvent();
+
+    // REQUISITO 13: Salvar automático
+    if (gameState.settings.autoSave) {
+        saveGame(true); // true para um salvamento silencioso
+    }
 }
 
 // -----------------------------------------------------------------------------------
-// FIM DE TEMPORADA
+// FIM DE TEMPORADA E TORNEIO DE ELITE
 // -----------------------------------------------------------------------------------
 function openEndOfSeasonFlow() {
     const comp = gameState.competitions['CBFD League One'];
     comp.winner = comp.table[0].name;
-    let summary = `<p>Campeão da Liga: <strong>${comp.winner}</strong></p>`;
+    
+    // REQUISITO 4: Premiações
+    const topScorer = comp.topScorers[0];
+    const bestPlayer = [...gameState.teams].flatMap(t => t.players).sort((a,b) => b.overall - a.overall)[0];
+    const bestManager = comp.winner; // Simplificado por enquanto
+
+    let summary = `
+        <p>Campeão da Liga: <strong class="text-yellow-400">${comp.winner}</strong></p>
+        <div class="border-t border-custom my-3"></div>
+        <p>Melhor Jogador: <strong>${bestPlayer.name}</strong> (${bestPlayer.teamName})</p>
+        <p>Artilheiro: <strong>${topScorer.name}</strong> (${topScorer.teamName}) - ${topScorer.seasonGoals} gols</p>
+        <p>Melhor Técnico: <strong>Técnico do ${bestManager}</strong></p>
+    `;
     document.getElementById('end-of-season-summary').innerHTML = summary;
     openModal('end-of-season-modal');
 }
@@ -1112,12 +1273,64 @@ function openEndOfSeasonFlow() {
 function startNewSeason() {
     gameState.season++;
     Object.values(gameState.competitions).forEach(c => {
-        c.schedule = []; c.table = []; c.winner = null; c.currentRound = 0;
+        if (c.schedule) {
+            c.schedule = []; c.table = []; c.winner = null; c.currentRound = 0;
+        }
     });
+    gameState.teams.forEach(t => t.players.forEach(p => {
+        p.seasonGoals = 0;
+        p.seasonMatches = 0;
+        p.age++;
+        // Regressão/Progressão de Overall
+        if (p.age > 30) p.overall = Math.max(50, p.overall - getRandomInt(1, 3));
+        else if (p.age < 24) p.overall = Math.min(99, p.overall + getRandomInt(1, 3));
+    }));
+    
+    gameState.transactions = [];
     generateAllSchedules();
     updateAllTables();
     updateCareerDashboard();
     closeModal('end-of-season-modal');
+
+    // REQUISITO 4: Convite para Torneio de Elite
+    const tournamentCost = 25000000;
+    const button = document.getElementById('accept-tournament-button');
+    if (gameState.budget < tournamentCost) {
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+        button.disabled = false;
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    openModal('elite-tournament-modal');
+}
+
+// REQUISITO 4: Lógica do Torneio de Elite
+function handleEliteTournament(accepted) {
+    closeModal('elite-tournament-modal');
+    if (accepted) {
+        const cost = 25000000;
+        gameState.budget -= cost;
+        addTransaction('Inscrição Torneio de Elite', cost, 'expense');
+        
+        const otherTeams = gameState.teams.filter(t => t.name !== gameState.userTeam).sort((a, b) => b.fanBase - a.fanBase).slice(0, 7);
+        const participants = [findTeam(gameState.userTeam), ...otherTeams];
+        
+        // Simulação simples do torneio
+        let winner = getRandom(participants);
+        let prize = 0;
+        if (winner.name === gameState.userTeam) {
+            prize = 50000000;
+            gameState.budget += prize;
+            addTransaction('Prêmio - Campeão Torneio de Elite', prize, 'income');
+            addMessage('Diretoria', `Parabéns, CAMPEÃO! Vencemos o Torneio de Elite e ganhamos ${formatCurrency(prize)}! A torcida está em festa!`);
+        } else {
+            addMessage('Diretoria', `Infelizmente fomos eliminados do Torneio de Elite. O campeão foi ${winner.name}. Foco total na liga agora!`);
+        }
+    } else {
+        addMessage('Diretoria', 'Entendemos a decisão de não participar do Torneio de Elite. Vamos usar os recursos para fortalecer o time para a temporada.');
+    }
+    updateCareerDashboard();
 }
 
 // -----------------------------------------------------------------------------------
@@ -1134,20 +1347,31 @@ function showMessage(title, text) {
     openModal('message-modal');
 }
 
-function saveGame() {
+function saveGame(isSilent = false) {
     if (!gameState.userTeam) { return; }
-    localStorage.setItem('cbfd25_save_v6', JSON.stringify(gameState));
-    showMessage('Sucesso', 'Jogo salvo com sucesso!');
+    localStorage.setItem('cbfd25_save_v7', JSON.stringify(gameState));
+    if (!isSilent) {
+        showMessage('Sucesso', 'Jogo salvo com sucesso!');
+    }
 }
 
 function loadGame() {
-    const savedGame = localStorage.getItem('cbfd25_save_v6');
+    const savedGame = localStorage.getItem('cbfd25_save_v7');
     if (savedGame) {
-        gameState = JSON.parse(savedGame);
-        // Garante que novas propriedades sejam adicionadas ao carregar um save antigo
-        if (!gameState.stadium) gameState.stadium = { level: 1, capacity: 10000 };
-        if (!gameState.club) gameState.club = { hasBus: false };
+        const loadedState = JSON.parse(savedGame);
         
+        // Migração de saves antigos, se necessário
+        if (!loadedState.version) {
+            // Adiciona novas propriedades que podem faltar em saves antigos
+            loadedState.version = "7.0";
+            loadedState.difficulty = loadedState.difficulty || 'normal';
+            loadedState.messages = loadedState.messages || [];
+            loadedState.transactions = loadedState.transactions || [];
+            loadedState.sponsorship = loadedState.sponsorship || { main: { name: "LUCCABET", value: 500000 }, secondary: null };
+            loadedState.settings = loadedState.settings || { autoSave: false };
+        }
+        gameState = loadedState;
+
         showMessage('Sucesso', 'Jogo carregado com sucesso!');
         initGame(false);
         showScreen('career-mode');
@@ -1160,9 +1384,14 @@ function resetProgress() {
     closeModal('settings-modal');
     showMessage('Confirmação', 'Tem certeza que deseja apagar todo o seu progresso? Esta ação não pode ser desfeita.');
     document.querySelector('#message-modal button').onclick = () => {
-        localStorage.removeItem('cbfd25_save_v6');
+        localStorage.removeItem('cbfd25_save_v7');
         location.reload();
     };
+}
+
+// REQUISITO 13: Lógica do Auto-Save
+function toggleAutoSave(isChecked) {
+    gameState.settings.autoSave = isChecked;
 }
 
 // -----------------------------------------------------------------------------------
@@ -1191,8 +1420,30 @@ function selectTeam(teamName) {
     gameState.userTeam = teamName;
     const userTeamObj = findTeam(teamName);
     if (userTeamObj) userTeamObj.isUserTeam = true;
+    
+    // REQUISITO 9: Mostrar modal de dificuldade
+    openModal('difficulty-modal');
+}
+// REQUISITO 9: Definir Dificuldade
+function setDifficulty(level) {
+    gameState.difficulty = level;
+    switch(level) {
+        case 'easy':
+            gameState.budget = 10000000;
+            break;
+        case 'goat':
+            gameState.budget = 1000000;
+            break;
+        case 'normal':
+        default:
+            gameState.budget = 5000000;
+            break;
+    }
+    closeModal('difficulty-modal');
+    addMessage('Bem-vindo, Treinador!', `A diretoria confia em você para liderar o ${gameState.userTeam} à glória nesta temporada. Boa sorte!`);
     showScreen('career-mode');
 }
+
 function renderLeagueTable() {
     const tableBody = document.getElementById('league-table-body');
     const tableData = gameState.competitions['CBFD League One'].table;
@@ -1225,7 +1476,6 @@ function renderTeamManagement() {
                         <div class="flex items-center" title="Moral"><span class="w-2 h-2 rounded-full bg-yellow-500 mr-1"></span><div class="w-full morale-bar-bg rounded-full h-1.5"><div class="morale-bar h-1.5 rounded-full" style="width: ${player.morale}%"></div></div></div>
                         <div class="flex items-center" title="Físico"><span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span><div class="w-full fitness-bar-bg rounded-full h-1.5"><div class="fitness-bar h-1.5 rounded-full" style="width: ${player.fitness}%"></div></div></div>
                     </div>
-                    <!-- REQUISITO 4: Botão de Venda de Jogador -->
                     <button onclick="sellPlayer(${player.id})" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded">Vender</button>
                 </div>
             </div>`;
@@ -1259,28 +1509,59 @@ function renderFullLeagueTable() {
     });
     html += `</tbody>`;
     table.innerHTML = html;
+
+    // REQUISITO 10: Renderizar artilheiros
+    const topScorersList = document.getElementById('top-scorers-list');
+    const topScorersData = gameState.competitions['CBFD League One'].topScorers;
+    topScorersList.innerHTML = '';
+    if (topScorersData && topScorersData.length > 0) {
+        topScorersData.forEach(player => {
+            topScorersList.innerHTML += `
+                <div class="flex justify-between items-center border-b border-custom pb-1">
+                    <span>${player.name} <span class="text-xs text-muted">(${player.teamName})</span></span>
+                    <span class="font-bold">${player.seasonGoals} Gols</span>
+                </div>
+            `;
+        });
+    } else {
+        topScorersList.innerHTML = `<p class="text-muted">Nenhum gol marcado ainda.</p>`;
+    }
 }
 function renderTransfers() {
     const transferBody = document.getElementById('transfer-list-body');
     if (!transferBody) return;
     document.getElementById('budget-display-transfer').innerText = formatCurrency(gameState.budget);
     transferBody.innerHTML = '';
-    gameState.transferMarket.slice(0, 50).forEach((player) => {
+    
+    // REQUISITO 10: Incluir jogadores de outros times no mercado
+    const allPlayersForSale = gameState.teams
+        .filter(t => t.name !== gameState.userTeam)
+        .flatMap(t => t.players)
+        .sort((a, b) => b.overall - a.overall)
+        .slice(0, 100); // Limita a lista para performance
+
+    allPlayersForSale.forEach((player) => {
         const row = document.createElement('tr');
         row.className = 'border-b border-custom hover:bg-gray-700/50';
         row.innerHTML = `
             <td class="p-2">${player.name}</td>
             <td class="p-2">${player.position}</td>
             <td class="p-2 text-center font-bold text-green-400">${player.overall}</td>
+            <td class="p-2 text-xs">${player.teamName}</td>
             <td class="p-2 text-sm">${formatCurrency(player.marketValue)}</td>
-            <td class="p-2 text-sm">${formatCurrency(player.salary)}</td>
-            <td class="p-2 text-center"><button onclick="buyPlayer(${player.id})" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded">Contratar</button></td>`;
+            <td class="p-2 text-center"><button onclick="buyPlayer(${player.id}, '${player.teamName}')" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded">Contratar</button></td>`;
         transferBody.appendChild(row);
     });
 }
-function buyPlayer(playerId) {
-    const player = gameState.transferMarket.find(p => p.id === playerId);
-    if (!player) return;
+function buyPlayer(playerId, teamName) {
+    const sellingTeam = findTeam(teamName);
+    if (!sellingTeam) return;
+
+    const playerIndex = sellingTeam.players.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) return;
+    
+    const player = sellingTeam.players[playerIndex];
+
     if (gameState.budget < player.marketValue) {
         showMessage('Sem V-Coins', 'Você não tem V-Coins suficientes para contratar este jogador.');
         return;
@@ -1290,14 +1571,23 @@ function buyPlayer(playerId) {
         showMessage('Elenco Cheio', 'Seu elenco está cheio. Venda um jogador antes de contratar.');
         return;
     }
+    
+    // Transferência
     gameState.budget -= player.marketValue;
+    addTransaction(`Compra de ${player.name} (${teamName})`, player.marketValue, 'expense');
+    
+    sellingTeam.players.splice(playerIndex, 1);
+    player.teamName = userTeam.name;
     userTeam.players.push(player);
-    gameState.transferMarket = gameState.transferMarket.filter(p => p.id !== playerId);
+
+    // O time que vendeu recebe o dinheiro (simples, sem IA de gastos por enquanto)
+    // E contrata um substituto genérico para não ficar com elenco vazio
+    sellingTeam.players.push(generatePlayer(gameState.nextPlayerId++, null, sellingTeam.name));
+
     showMessage('Contratado!', `${player.name} agora faz parte do seu time!`);
     renderTransfers();
     updateCareerDashboard();
 }
-// REQUISITO 4: Venda de Jogadores
 function sellPlayer(playerId) {
     const userTeam = findTeam(gameState.userTeam);
     const playerIndex = userTeam.players.findIndex(p => p.id === playerId);
@@ -1311,11 +1601,13 @@ function sellPlayer(playerId) {
     const [player] = userTeam.players.splice(playerIndex, 1);
     const saleValue = Math.round(player.marketValue * getRandomInt(80, 110) / 100);
     gameState.budget += saleValue;
+    addTransaction(`Venda de ${player.name}`, saleValue, 'income');
     
-    // Adiciona um novo jogador aleatório ao mercado para manter o fluxo
-    gameState.transferMarket.unshift(generatePlayer(gameState.nextPlayerId++));
+    const randomTeam = getRandom(gameState.teams.filter(t => t.name !== userTeam.name));
+    player.teamName = randomTeam.name;
+    randomTeam.players.push(player);
 
-    showMessage('Vendido!', `${player.name} foi vendido por ${formatCurrency(saleValue)}!`);
+    showMessage('Vendido!', `${player.name} foi vendido por ${formatCurrency(saleValue)} para o ${randomTeam.name}!`);
     renderTeamManagement();
     updateCareerDashboard();
 }
@@ -1325,10 +1617,11 @@ function renderCalendar() {
     if (!view) return;
     view.innerHTML = '';
     gameState.calendar.forEach(round => {
-        let html = `<div class="mb-4"><h4 class="font-bold text-lg mb-2">${round.type} - ${round.round}</h4>`;
+        let html = `<div class="mb-4"><h4 class="font-bold text-lg mb-2">${round.round} - <span class="text-muted font-normal">${round.date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</span></h4>`;
         round.matches.forEach(match => {
+            const isUserMatch = match.home === gameState.userTeam || match.away === gameState.userTeam;
             const result = match.result ? `<span class="font-bold">${match.result[0]} - ${match.result[1]}</span>` : `<span class="text-muted">A jogar</span>`;
-            html += `<div class="text-sm p-2 flex justify-between items-center border-b border-custom"><span>${match.home} vs ${match.away}</span> ${result}</div>`;
+            html += `<div class="text-sm p-2 flex justify-between items-center border-b border-custom ${isUserMatch ? 'bg-indigo-900/30' : ''}"><span>${match.home} vs ${match.away}</span> ${result}</div>`;
         });
         html += `</div>`;
         view.innerHTML += html;
@@ -1340,7 +1633,7 @@ function renderCompetitionsScreen() {
     grid.innerHTML = '';
     Object.keys(gameState.competitions).forEach(key => {
         const comp = gameState.competitions[key];
-        if (comp.schedule.length > 0) {
+        if (comp.schedule && comp.schedule.length > 0) {
             const card = document.createElement('div');
             card.className = 'bg-card p-4 rounded-lg cursor-pointer hover:bg-gray-700 transition-all border border-custom';
             card.innerHTML = `<h3 class="font-semibold text-lg">${key}</h3>`;
@@ -1359,7 +1652,7 @@ function updateTactics() {
     gameState.tactics.formation = document.getElementById('formation-select').value;
     gameState.tactics.style = document.getElementById('style-select').value;
 }
-// REQUISITO 5: Renderizar CBFD NEWS
+// REQUISITO 2: Renderizar CBFD NEWS
 function renderNewspapers() {
     const feed = document.getElementById('news-feed');
     feed.innerHTML = '';
@@ -1372,36 +1665,35 @@ function renderNewspapers() {
             <div class="border-b border-custom pb-3 last:border-b-0">
                 <p class="font-semibold text-blue-400">${newsItem.headline}</p>
                 <p class="text-sm mt-1">${newsItem.story}</p>
-                <p class="text-xs text-muted text-right mt-1">${newsItem.source}</p>
+                <p class="text-xs text-muted text-right mt-1">${newsItem.source} - ${newsItem.date.toLocaleDateString('pt-BR')}</p>
             </div>
         `;
     });
 }
-// REQUISITO 5: Gerador de Notícias CBFD NEWS
-function generateCbfdNews(round) {
+// REQUISITO 2 & 3: Gerador de Notícias e Eventos Aleatórios
+function generateCbfdNews(round, customEvent = null) {
+    if (customEvent) {
+        gameState.news.unshift({ ...customEvent, date: new Date() });
+    }
+
     const userMatch = round.matches.find(m => m.home === gameState.userTeam || m.away === gameState.userTeam);
     
-    // Notícia principal: resultado do jogo do usuário
     if(userMatch && userMatch.result) {
         const result = userMatch.result;
         const opponent = userMatch.home === gameState.userTeam ? userMatch.away : userMatch.home;
         let outcome, headline;
         if ((userMatch.home === gameState.userTeam && result[0] > result[1]) || (userMatch.away === gameState.userTeam && result[1] > result[0])) {
-            outcome = 'vence';
-            headline = `VITÓRIA IMPORTANTE!`;
+            outcome = 'vence'; headline = `VITÓRIA IMPORTANTE!`;
         } else if (result[0] === result[1]) {
-            outcome = 'empata com';
-            headline = `TUDO IGUAL!`;
+            outcome = 'empata com'; headline = `TUDO IGUAL!`;
         } else {
-            outcome = 'perde para';
-            headline = `TROPEÇO INESPERADO!`;
+            outcome = 'perde para'; headline = `TROPEÇO INESPERADO!`;
         }
         const story = `Pela ${round.round}, o ${gameState.userTeam} ${outcome} o ${opponent} por ${result[0]} a ${result[1]}. A torcida está dividida sobre o resultado.`;
-        gameState.news.unshift({ headline, story, source: "Redação CBFD NEWS" });
+        gameState.news.unshift({ headline, story, source: "Redação CBFD NEWS", date: new Date() });
     }
 
-    // Notícia secundária: humor, rumor ou fake news
-    if (Math.random() < 0.6) { // 60% de chance de uma notícia extra
+    if (Math.random() < 0.6) {
         const userTeam = findTeam(gameState.userTeam);
         const randomPlayer = getRandom(userTeam.players);
         const randomOpponentTeam = getRandom(gameState.teams.filter(t => t.name !== gameState.userTeam));
@@ -1412,15 +1704,81 @@ function generateCbfdNews(round) {
             { headline: "FAKE NEWS?", story: `Boatos na internet afirmam que a CBFD planeja introduzir um "VAR da Torcida", onde o resultado do jogo seria decidido por votação popular. A federação ainda não se pronunciou.`, source: "ZapZap News" },
             { headline: "INVESTIMENTO PESADO!", story: `O técnico do ${gameState.userTeam} foi visto comprando 50kg de café. Aparentemente, as noites de estudo tático serão longas.`, source: "Café com Futebol" }
         ];
-        gameState.news.unshift(getRandom(templates));
+        gameState.news.unshift({...getRandom(templates), date: new Date()});
     }
 
-    // Limita o número de notícias para não sobrecarregar
-    if (gameState.news.length > 20) {
-        gameState.news = gameState.news.slice(0, 20);
+    if (gameState.news.length > 30) {
+        gameState.news = gameState.news.slice(0, 30);
     }
 }
-// REQUISITO 4: Funções de Economia
+// REQUISITO 3: Gatilho de Eventos Aleatórios
+function triggerRandomEvent() {
+    if (Math.random() > 0.15) return; // 15% de chance de um evento por rodada
+
+    const userTeam = findTeam(gameState.userTeam);
+    const randomPlayer = getRandom(userTeam.players);
+
+    const events = [
+        {
+            id: 'ct_theft',
+            condition: () => gameState.budget > 100000,
+            action: () => {
+                const loss = Math.floor(gameState.budget * 0.05);
+                gameState.budget -= loss;
+                addTransaction('Furto no CT', loss, 'expense');
+                const news = { headline: "QUE PREJUÍZO!", story: `Ladrões invadiram o CT do ${gameState.userTeam} e levaram equipamentos. O clube registrou um prejuízo de ${formatCurrency(loss)}.`, source: "Segurança CBFD" };
+                gameState.news.unshift({ ...news, date: new Date() });
+            }
+        },
+        {
+            id: 'player_sick',
+            condition: () => userTeam.players.filter(p => p.suspended === 0).length > 18,
+            action: () => {
+                randomPlayer.suspended = 1;
+                const news = { headline: "JOGADOR PASSA MAL!", story: `${randomPlayer.name} teve uma intoxicação alimentar após comer um espetinho suspeito e desfalcará o ${gameState.userTeam} no próximo jogo.`, source: "Departamento Médico" };
+                gameState.news.unshift({ ...news, date: new Date() });
+            }
+        },
+        {
+            id: 'fan_brawl',
+            condition: () => userTeam.fanBase > 30000,
+            action: () => {
+                const fine = getRandomInt(50000, 200000);
+                gameState.budget -= fine;
+                userTeam.fanBase = Math.floor(userTeam.fanBase * 0.98);
+                addTransaction('Multa por briga de torcida', fine, 'expense');
+                const news = { headline: "CENAS LAMENTÁVEIS!", story: `Uma briga entre torcedores do ${gameState.userTeam} manchou o espetáculo. O clube foi multado em ${formatCurrency(fine)} pela CBFD.`, source: "Tribunal Desportivo" };
+                gameState.news.unshift({ ...news, date: new Date() });
+            }
+        },
+        {
+            id: 'fan_invasion',
+            condition: () => true,
+            action: () => {
+                const news = { headline: "INVASÃO NO CT!", story: `Um fã mais exaltado invadiu o treino para pedir a camisa do ${randomPlayer.name}. Apesar do susto, o torcedor foi contido e liberado após tirar uma selfie.`, source: "Humor Esportivo" };
+                gameState.news.unshift({ ...news, date: new Date() });
+            }
+        }
+    ];
+
+    const possibleEvents = events.filter(e => e.condition());
+    if (possibleEvents.length > 0) {
+        getRandom(possibleEvents).action();
+    }
+}
+
+// REQUISITO 6: Funções de Finanças e Clube
+function addTransaction(description, amount, type) {
+    gameState.transactions.unshift({
+        date: new Date(),
+        description,
+        amount,
+        type // 'income' or 'expense'
+    });
+    if (gameState.transactions.length > 50) {
+        gameState.transactions = gameState.transactions.slice(0, 50);
+    }
+}
 function renderFinances() {
     const { stadium, club } = gameState;
     const nextLevel = stadium.level + 1;
@@ -1428,31 +1786,43 @@ function renderFinances() {
 
     document.getElementById('stadium-level').innerText = stadium.level;
     document.getElementById('stadium-capacity').innerText = stadium.capacity.toLocaleString('pt-BR');
-    document.getElementById('stadium-revenue').innerText = formatCurrency(stadium.capacity * 15);
     document.getElementById('upgrade-stadium-cost').innerText = formatCurrency(upgradeCost);
 
     const upgradeButton = document.getElementById('upgrade-stadium-button');
-    if (gameState.budget < upgradeCost) {
-        upgradeButton.disabled = true;
-        upgradeButton.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-        upgradeButton.disabled = false;
-        upgradeButton.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
+    upgradeButton.disabled = gameState.budget < upgradeCost;
+    upgradeButton.classList.toggle('opacity-50', gameState.budget < upgradeCost);
+    upgradeButton.classList.toggle('cursor-not-allowed', gameState.budget < upgradeCost);
 
     const busStatusDiv = document.getElementById('bus-status');
     if (club.hasBus) {
-        busStatusDiv.innerHTML = `<p class="text-green-400 font-bold"><i class="fas fa-check-circle mr-2"></i>Ônibus do Time Adquirido!</p><p class="text-sm text-muted mt-2">Seu time agora viaja com estilo e conforto, melhorando a moral dos jogadores.</p>`;
+        busStatusDiv.innerHTML = `<h4 class="font-semibold">Ônibus do Time</h4><p class="text-sm text-green-400"><i class="fas fa-check-circle mr-1"></i> Adquirido</p>`;
     } else {
         const busCost = 2500000;
         const canAfford = gameState.budget >= busCost;
         busStatusDiv.innerHTML = `
-            <p>Ônibus do Time</p>
-            <p class="text-sm text-muted mt-2">Compre um ônibus personalizado para melhorar a moral da equipe em jogos fora de casa.</p>
-            <button onclick="buyBus()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg ${!canAfford ? 'opacity-50 cursor-not-allowed' : ''}" ${!canAfford ? 'disabled' : ''}>
-                Comprar Ônibus (${formatCurrency(busCost)})
+            <h4 class="font-semibold">Ônibus do Time</h4>
+            <p class="text-sm text-muted">Melhora a moral em jogos fora.</p>
+            <button onclick="buyBus()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm ${!canAfford ? 'opacity-50 cursor-not-allowed' : ''}" ${!canAfford ? 'disabled' : ''}>
+                Comprar (${formatCurrency(busCost)})
             </button>
         `;
+    }
+
+    const reportDiv = document.getElementById('financial-report');
+    reportDiv.innerHTML = '';
+    if (gameState.transactions.length > 0) {
+        gameState.transactions.forEach(t => {
+            const color = t.type === 'income' ? 'text-green-400' : 'text-red-400';
+            const sign = t.type === 'income' ? '+' : '-';
+            reportDiv.innerHTML += `
+                <div class="flex justify-between items-center border-b border-custom pb-1">
+                    <span>${t.description} <span class="text-xs text-muted">(${t.date.toLocaleDateString()})</span></span>
+                    <span class="font-bold ${color}">${sign}${formatCurrency(t.amount)}</span>
+                </div>
+            `;
+        });
+    } else {
+        reportDiv.innerHTML = `<p class="text-muted">Nenhuma transação registrada nesta temporada.</p>`;
     }
 }
 
@@ -1463,11 +1833,10 @@ function upgradeStadium() {
         gameState.budget -= upgradeCost;
         gameState.stadium.level = nextLevel;
         gameState.stadium.capacity += 5000 * Math.pow(nextLevel, 1.5);
+        addTransaction('Ampliação do estádio', upgradeCost, 'expense');
         showMessage('Estádio Ampliado!', `Seu estádio foi melhorado para o nível ${gameState.stadium.level}, com capacidade para ${gameState.stadium.capacity.toLocaleString('pt-BR')} torcedores!`);
         renderFinances();
         updateCareerDashboard();
-    } else {
-        showMessage('Sem V-Coins!', 'Você não tem V-Coins suficientes para ampliar o estádio.');
     }
 }
 
@@ -1476,13 +1845,71 @@ function buyBus() {
      if (gameState.budget >= busCost) {
         gameState.budget -= busCost;
         gameState.club.hasBus = true;
+        addTransaction('Compra do ônibus do clube', busCost, 'expense');
         showMessage('Compra Realizada!', `Parabéns! Seu clube agora tem um ônibus de última geração!`);
         renderFinances();
         updateCareerDashboard();
-    } else {
-        showMessage('Sem V-Coins!', 'Você não tem V-Coins suficientes para comprar o ônibus.');
     }
 }
+
+// REQUISITO 14: Lógica de Mensagens
+function addMessage(from, text, isRead = false) {
+    gameState.messages.unshift({ from, text, date: new Date(), read: isRead });
+    if (gameState.messages.length > 30) {
+        gameState.messages = gameState.messages.slice(0, 30);
+    }
+    updateCareerDashboard(); // Atualiza a notificação
+}
+function renderMessages() {
+    const feed = document.getElementById('messages-feed');
+    feed.innerHTML = '';
+    if (gameState.messages.length === 0) {
+        feed.innerHTML = '<p class="text-muted">Nenhuma mensagem na sua caixa de entrada.</p>';
+        return;
+    }
+    gameState.messages.forEach(msg => {
+        feed.innerHTML += `
+            <div class="border-b border-custom pb-3 last:border-b-0 ${!msg.read ? 'bg-indigo-900/20' : ''} p-3 rounded-lg">
+                <p class="font-semibold text-purple-400">De: ${msg.from}</p>
+                <p class="text-sm mt-1">${msg.text}</p>
+                <p class="text-xs text-muted text-right mt-1">${msg.date.toLocaleString('pt-BR')}</p>
+            </div>
+        `;
+        msg.read = true; // Marca como lida ao abrir a tela
+    });
+    updateCareerDashboard(); // Limpa a notificação
+}
+
+// REQUISITO 7: Base para o CBFD Draft (Funções ocultas)
+function cbfdDraft_generatePlayerPool(quality = 'normal') {
+    const poolSize = 50;
+    const pool = [];
+    for (let i = 0; i < poolSize; i++) {
+        const player = generatePlayer(gameState.nextPlayerId++);
+        if (quality === 'premium') {
+            player.overall += 15;
+        } else if (quality === 'basic') {
+            player.overall -= 5;
+        }
+        pool.push(player);
+    }
+    return pool;
+}
+function cbfdDraft_spin() {
+    const pool = cbfdDraft_generatePlayerPool('premium');
+    const chances = pool.map(p => 1 / (p.overall - 40)); // Jogadores melhores são mais raros
+    const totalChance = chances.reduce((a, b) => a + b, 0);
+    let random = Math.random() * totalChance;
+    
+    for (let i = 0; i < pool.length; i++) {
+        random -= chances[i];
+        if (random <= 0) {
+            return pool[i];
+        }
+    }
+    return pool[0]; // Fallback
+}
+// Para usar no futuro: const draftedPlayer = cbfdDraft_spin();
 
 </script>
 
