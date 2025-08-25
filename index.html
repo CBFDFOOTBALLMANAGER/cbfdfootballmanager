@@ -113,6 +113,14 @@
 
         /* New styles for fullscreen gameplay */
         body.fullscreen-lock {
+        
+        /* Mobile-friendly scrolling for the narrative panel */
+        #match-simulation-narrative {
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+          touch-action: pan-y;
+        }
+
             position: fixed;
             inset: 0;
             width: 100vw;
@@ -165,6 +173,67 @@
             cursor: pointer;
             border-radius: 50%;
         }
+
+        /* === INÍCIO: NOVOS ESTILOS PARA A LOJA === */
+
+        /* Hero da Loja */
+        #shop-hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://i.imgur.com/J7ruPaK.png');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Título Neon */
+        .neon-title {
+            font-size: 6rem; /* text-8xl ou similar */
+            font-weight: 900; /* font-black */
+            color: #fff;
+            text-shadow:
+                0 0 7px #fff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                0 0 42px #d300c4,
+                0 0 82px #d300c4,
+                0 0 92px #d300c4,
+                0 0 102px #d300c4,
+                0 0 151px #d300c4;
+        }
+        
+        /* Botões da Loja */
+        .shop-action-button {
+            background-color: #d300c4; /* Cor rosa/neon */
+            color: white;
+            padding: 1rem 1.5rem; /* py-4 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 700; /* font-bold */
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #d300c4;
+            box-shadow: 0 0 5px #d300c4, 0 0 10px #d300c4;
+        }
+
+        .shop-action-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 8px #d300c4, 0 0 20px #d300c4, 0 0 30px #d300c4;
+        }
+
+        /* Miniatura no botão do menu */
+        .shop-thumbnail {
+            width: 28px;
+            height: 28px;
+            border-radius: 0.25rem;
+            object-fit: cover;
+            margin-right: 0.5rem; /* mr-2 */
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* === FIM: NOVOS ESTILOS PARA A LOJA === */
     </style>
 </head>
 <body class="dark-mode min-h-screen">
@@ -181,7 +250,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
                     <button onclick="showScreen('career-mode')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-trophy mr-2"></i> Modo Carreira</button>
                     <button onclick="showScreen('competitions')" class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-list-ol mr-2"></i> Competições</button>
-                    <button onclick="showScreen('shop')" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-store mr-2"></i> Loja</button>
+                    <button onclick="showScreen('shop')" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg flex items-center justify-center">
+                        <img src="https://i.imgur.com/J7ruPaK.png" alt="Shop Thumbnail" class="shop-thumbnail">
+                        <i class="fas fa-store mr-2"></i> 
+                        <span>Loja</span>
+                    </button>
                     <button onclick="openModal('settings-modal')" class="bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-cog mr-2"></i> Configurações</button>
                 </div>
             </div>
@@ -338,31 +411,30 @@
                 </div>
             </div>
         </div>
-
+        
         <div id="shop" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="gameState.userTeam ? showScreen('career-mode') : showScreen('main-menu')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
                 <h2 class="text-3xl font-bold">Loja</h2>
                 <div></div>
             </div>
-            <div class="bg-card rounded-xl p-8 border border-custom">
-                <div class="text-center">
-                    <i class="fas fa-tools text-5xl text-yellow-500 mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-2">Loja em Obras!</h3>
-                    <p class="text-muted mb-6">Nossa loja com itens exclusivos e V-Coins (com preços em R$) está em desenvolvimento. Volte em breve!</p>
-                    <div class="border-t border-custom pt-6">
-                        <h4 class="text-xl font-semibold">Apoie o Projeto</h4>
-                        <p class="text-muted my-2">Considere fazer uma doação para nos ajudar a continuar desenvolvendo o CBFD 25!</p>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg opacity-50 cursor-not-allowed">Fazer Doação (Em Breve)</button>
-                    </div>
-                </div>
-                <div class="mt-8 border-t border-custom pt-6 text-center">
-                    <h3 class="text-2xl font-bold mb-2">CBFD Draft</h3>
-                    <p class="text-muted">Modo indisponível, em breve!</p>
-                </div>
+
+            <div id="shop-hero" class="mb-8">
+                <h1 class="neon-title text-center">CBFD 25</h1>
+            </div>
+
+            <div id="shop-actions" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <button onclick="openPlayerPaks()" class="shop-action-button">
+                    Player Paks
+                </button>
+                <button onclick="openCustomizations()" class="shop-action-button">
+                    Customizations
+                </button>
+                <button onclick="openCoinsGems()" class="shop-action-button">
+                    Coins e Gems
+                </button>
             </div>
         </div>
-
         <div id="tactics" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
@@ -596,7 +668,7 @@
             <button onclick="handleFired()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">Procurar Novo Emprego</button>
         </div>
     </div>
-
+    
     <div id="toast-container"></div>
 
     <footer class="text-center text-xs text-muted py-4 mt-8 border-t border-custom">
@@ -625,6 +697,43 @@ let substitutionState = {
     selectedStarter: null, selectedBench: null,
     isTacticsScreen: false // Flag para diferenciar da substituição em jogo
 };
+
+// --- INÍCIO: LÓGICA DA LOJA E FUNÇÕES DOS BOTÕES ---
+
+/**
+ * Exibe uma mensagem informativa na tela usando o modal de mensagens padrão.
+ * @param {string} title - O título a ser exibido no modal.
+ * @param {string} contentHTML - O HTML do conteúdo a ser exibido no corpo do modal.
+ */
+function openShopModal(title, contentHTML) {
+    // Extrai o texto do HTML para usar na função showMessage
+    const textContent = contentHTML.replace(/<[^>]*>/g, '');
+    showMessage(title, textContent);
+}
+
+// Funções chamadas pelos botões da loja
+function openPlayerPaks() {
+    openShopModal(
+        'Player Paks',
+        '<p class="text-lg">Pacotes de jogadores com itens exclusivos estarão disponíveis aqui em breve. Fique de olho para fortalecer seu elenco!</p>'
+    );
+}
+
+function openCustomizations() {
+    openShopModal(
+        'Customizations',
+        '<p class="text-lg">Personalize seus uniformes, escudos e estádio. A seção de customizações está em desenvolvimento e chegará em breve!</p>'
+    );
+}
+
+function openCoinsGems() {
+    openShopModal(
+        'Coins e Gems',
+        '<p class="text-lg">Ainda estamos finalizando os pacotes de V-Coins e Gemas. Em breve você poderá adquirir moedas para acelerar seu progresso!</p>'
+    );
+}
+// --- FIM: LÓGICA DA LOJA E FUNÇÕES DOS BOTÕES ---
+
 
 // -----------------------------------------------------------------------------------
 // BANCO DE DADOS INICIAL
@@ -1326,6 +1435,23 @@ function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
 }
 
 
+
+let userIsScrolling = false;
+function isNearBottom(el, threshold = 40) {
+  return (el.scrollHeight - el.scrollTop - el.clientHeight) <= threshold;
+}
+function attachNarrativeScrollGuards() {
+  const el = document.getElementById('match-simulation-narrative');
+  if (!el || el.__guardsInstalled) return;
+  let scrollEndTimer = null;
+  const onUserScrollStart = () => { userIsScrolling = true; if (scrollEndTimer) clearTimeout(scrollEndTimer); };
+  const onUserScrollEndSoon = () => { scrollEndTimer = setTimeout(() => { userIsScrolling = false; }, 300); };
+  el.addEventListener('scroll', onUserScrollStart, { passive: true });
+  el.addEventListener('touchstart', onUserScrollStart, { passive: true });
+  el.addEventListener('touchend', onUserScrollEndSoon, { passive: true });
+  el.__guardsInstalled = true;
+}
+
 function startNarratedSimulation(matchData) {
     const homeTeam = findTeam(matchData.match.home);
     const awayTeam = findTeam(matchData.match.away);
@@ -1358,6 +1484,7 @@ function startNarratedSimulation(matchData) {
 
     showScreen('match-simulation');
 
+    attachNarrativeScrollGuards();
     resumeSimulation();
 }
 
@@ -1384,7 +1511,9 @@ function resumeSimulation() {
 
         if (simulationState.minute === 45 && !simulationState.paused) {
             narrativeDiv.innerHTML += `<p class="match-event narrative-event"><strong>45'</strong>: Intervalo!</p>`;
-            narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+            if (!userIsScrolling && isNearBottom(narrativeDiv)) {
+      narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    }
             if (simulationState.matchData.match.home === gameState.userTeam || simulationState.matchData.match.away === gameState.userTeam) {
                 document.getElementById('substitution-button').classList.remove('hidden');
                 document.getElementById('substitution-button').onclick = () => openSubstitutionModal();
@@ -1424,14 +1553,18 @@ function resumeSimulation() {
             }
             p.innerHTML = `<strong>${event.minute}'</strong>: ${icon} ${text}`;
             narrativeDiv.appendChild(p);
-            narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+            if (!userIsScrolling && isNearBottom(narrativeDiv)) {
+      narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    }
             simulationState.eventIndex++;
         }
 
         if (simulationState.minute >= 90) {
             pauseSimulation();
             narrativeDiv.innerHTML += `<p class="match-event narrative-event"><strong>90'</strong>: Fim de jogo!</p>`;
-            narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+            if (!userIsScrolling && isNearBottom(narrativeDiv)) {
+      narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    }
             document.getElementById('substitution-button').classList.add('hidden');
             document.getElementById('finish-match-button').classList.remove('hidden');
             document.getElementById('finish-match-button').onclick = () => finishMatch();
@@ -1483,7 +1616,9 @@ function triggerInteractiveEvent() {
 
     const narrativeDiv = document.getElementById('match-simulation-narrative');
     narrativeDiv.innerHTML += `<p class="match-event interactive-event"><strong>${simulationState.minute}'</strong>: <i class="fas fa-star text-yellow-400"></i> ${narrativeText}</p>`;
-    narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    if (!userIsScrolling && isNearBottom(narrativeDiv)) {
+      narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    }
     controlsDiv.classList.remove('hidden');
 }
 
@@ -1539,7 +1674,9 @@ function handleInteractiveAction(action, playerId) {
     }
     
     narrativeDiv.innerHTML += `<p class="match-event narrative-event">${resultText}</p>`;
-    narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    if (!userIsScrolling && isNearBottom(narrativeDiv)) {
+      narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    }
 
     setTimeout(resumeSimulation, 1500); // Wait a bit before resuming
 }
@@ -1585,9 +1722,12 @@ function selectPlayerForSub(type, playerIndexInList, listType) {
             const playerIn = userTeam.players[starterIndex]; // They are now a starter
             const narrativeDiv = document.getElementById('match-simulation-narrative');
             narrativeDiv.innerHTML += `<p class="match-event sub-event"><strong>${simulationState.minute}'</strong>: <i class="fas fa-exchange-alt text-blue-400"></i> Substituição! Sai ${playerOut.name}, entra ${playerIn.name}.</p>`;
-            narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+            if (!userIsScrolling && isNearBottom(narrativeDiv)) {
+      narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    }
             closeModal('substitution-modal');
-            resumeSimulation();
+            attachNarrativeScrollGuards();
+    resumeSimulation();
         }
         // Reset selection
         substitutionState.selectedStarter = null;
@@ -1598,7 +1738,8 @@ function selectPlayerForSub(type, playerIndexInList, listType) {
 function cancelSubstitutions() {
     closeModal('substitution-modal');
     if (!substitutionState.isTacticsScreen) {
-        resumeSimulation();
+        attachNarrativeScrollGuards();
+    resumeSimulation();
     }
 }
 
@@ -2523,7 +2664,7 @@ function renderNewspapers() {
             <div class="border-b border-custom pb-3 last:border-b-0">
                 <p class="font-semibold text-blue-400">${newsItem.headline}</p>
                 <p class="text-sm mt-1">${newsItem.story}</p>
-                <p class="text-xs text-muted text-right mt-1">${newsItem.source} - ${new Date(newsItem.date).toLocaleDateString('pt-BR')}</p>
+                <p class="text-xs text-muted text-right mt-1">${new Date(newsItem.date).toLocaleDateString('pt-BR')}</p>
             </div>
         `;
     });
