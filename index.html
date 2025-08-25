@@ -59,6 +59,7 @@
         .injury-event { border-color: #a855f7; background-color: rgba(168, 85, 247, 0.1); }
         .sub-event { border-color: #3b82f6; background-color: rgba(59, 130, 246, 0.1); }
         .narrative-event { border-color: #6b7280; }
+        .interactive-event { border-color: #f59e0b; background-color: rgba(245, 158, 11, 0.1); font-weight: 600; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -137,13 +138,32 @@
         }
 
         /* Ensure inputs have font-size >= 16px to prevent mobile zoom */
-        input[type="text"], select {
+        input[type="text"], select, input[type="range"] {
             font-size: 16px;
         }
 
         /* Add touch-action to main buttons */
         button {
             touch-action: manipulation;
+        }
+        /* Match Controls Slider */
+        input[type="range"].mentality-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="range"].mentality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -154,7 +174,6 @@
 
     <div id="game-container" class="max-w-7xl mx-auto p-2 sm:p-4">
 
-        <!-- Main Menu -->
         <div id="main-menu" class="screen text-center">
             <div class="bg-stadium rounded-xl p-6 sm:p-8 mb-6 shadow-2xl">
                 <h1 class="text-5xl md:text-7xl font-black mb-2 text-green-400 tracking-tighter">CBFD 25</h1>
@@ -172,7 +191,6 @@
             </div>
         </div>
 
-        <!-- Career Mode Screens -->
         <div id="career-mode" class="screen hidden">
             <div id="career-setup">
                 <h2 class="text-3xl font-bold text-center mb-6">Escolha seu Time</h2>
@@ -204,14 +222,13 @@
                                 <button onclick="simulateRound()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm font-semibold w-full transition-transform transform hover:scale-105">Simulação Rápida <i class="fas fa-forward ml-1"></i></button>
                             </div>
                         </div>
-                        <!-- Season Goals Card -->
                         <div id="season-goals-card" class="bg-card rounded-xl p-4 shadow-lg border border-custom"></div>
                         <div class="bg-card rounded-xl p-4 shadow-lg border border-custom">
                             <h4 class="font-semibold mb-3 text-lg border-b border-custom pb-2">Gerenciamento</h4>
-                            <div class="space-y-2">
+                            <div id="management-buttons" class="space-y-2">
                                 <button onclick="showScreen('team-management')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-users w-6 text-center mr-2"></i> Elenco</button>
                                 <button onclick="showScreen('tactics')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-clipboard-list w-6 text-center mr-2"></i> Táticas</button>
-                                <button onclick="showScreen('transfers')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-exchange-alt w-6 text-center mr-2"></i> Transferências</button>
+                                <button id="transfers-button" onclick="showScreen('transfers')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-exchange-alt w-6 text-center mr-2"></i> Transferências</button>
                                 <button onclick="showScreen('finances')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-landmark w-6 text-center mr-2"></i> Finanças e Clube</button>
                                 <button onclick="showScreen('calendar')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-calendar-alt w-6 text-center mr-2"></i> Calendário</button>
                                 <button onclick="showScreen('newspapers')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-newspaper w-6 text-center mr-2"></i> CBFD NEWS</button>
@@ -239,7 +256,6 @@
             </div>
         </div>
 
-        <!-- Other Screens -->
         <div id="newspapers" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
@@ -275,11 +291,39 @@
                         <div>
                             <h4 class="font-semibold">Estádio</h4>
                             <p class="text-sm text-muted">Nível: <span id="stadium-level" class="font-bold">1</span> | Capacidade: <span id="stadium-capacity" class="font-bold">10.000</span></p>
-                            <button id="upgrade-stadium-button" onclick="upgradeStadium()" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                            <button id="upgrade-stadium-button" onclick="upgradeStructure('stadium')" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
                                 Ampliar (<span id="upgrade-stadium-cost"></span>)
                             </button>
                         </div>
                         <div id="bus-status"></div>
+                        <div>
+                            <h4 class="font-semibold">Academia de Treinamento</h4>
+                            <p class="text-sm text-muted">Nível: <span id="academy-level" class="font-bold">1</span>. Melhora o desenvolvimento dos jogadores.</p>
+                            <button id="upgrade-academy-button" onclick="upgradeStructure('academy')" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                                Investir (<span id="upgrade-academy-cost"></span>)
+                            </button>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Centro Médico</h4>
+                            <p class="text-sm text-muted">Nível: <span id="medical-level" class="font-bold">1</span>. Reduz a gravidade e frequência de lesões.</p>
+                            <button id="upgrade-medical-button" onclick="upgradeStructure('medical')" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                                Investir (<span id="upgrade-medical-cost"></span>)
+                            </button>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Departamento de Marketing</h4>
+                            <p class="text-sm text-muted">Nível: <span id="marketing-level" class="font-bold">1</span>. Aumenta a receita de patrocínios.</p>
+                            <button id="upgrade-marketing-button" onclick="upgradeStructure('marketing')" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                                Investir (<span id="upgrade-marketing-cost"></span>)
+                            </button>
+                        </div>
+                         <div>
+                            <h4 class="font-semibold">Rede de Scouting</h4>
+                            <p class="text-sm text-muted">Nível: <span id="scouting-level" class="font-bold">1</span>. Reduz o custo de contratações.</p>
+                            <button id="upgrade-scouting-button" onclick="upgradeStructure('scouting')" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                                Investir (<span id="upgrade-scouting-cost"></span>)
+                            </button>
+                        </div>
                         <div>
                             <h4 class="font-semibold">Patrocínios</h4>
                             <div id="sponsorships-details" class="text-sm text-muted">Verificando propostas...</div>
@@ -312,7 +356,6 @@
                         <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg opacity-50 cursor-not-allowed">Fazer Doação (Em Breve)</button>
                     </div>
                 </div>
-                <!-- CBFD Draft Section -->
                 <div class="mt-8 border-t border-custom pt-6 text-center">
                     <h3 class="text-2xl font-bold mb-2">CBFD Draft</h3>
                     <p class="text-muted">Modo indisponível, em breve!</p>
@@ -417,25 +460,26 @@
                     <p>V-Coins: <span id="budget-display-transfer" class="font-bold text-green-400"></span></p>
                 </div>
             </div>
-            <!-- Name Search Input -->
-            <div class="mb-4">
-                <input type="text" id="player-search-input" onkeyup="renderTransfers()" placeholder="Buscar jogador pelo nome..." class="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="bg-card rounded-xl p-4 overflow-x-auto border border-custom">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="text-left text-muted border-b border-custom">
-                            <th class="p-2">Nome</th>
-                            <th class="p-2">Pos.</th>
-                            <th class="p-2 text-center">OVR</th>
-                            <th class="p-2 text-center">Pot.</th>
-                            <th class="p-2">Clube</th>
-                            <th class="p-2">Valor</th>
-                            <th class="p-2 text-center">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transfer-list-body"></tbody>
-                </table>
+            <div id="transfer-content">
+                <div class="mb-4">
+                    <input type="text" id="player-search-input" onkeyup="renderTransfers()" placeholder="Buscar jogador pelo nome..." class="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="bg-card rounded-xl p-4 overflow-x-auto border border-custom">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-muted border-b border-custom">
+                                <th class="p-2">Nome</th>
+                                <th class="p-2">Pos.</th>
+                                <th class="p-2 text-center">OVR</th>
+                                <th class="p-2 text-center">Pot.</th>
+                                <th class="p-2">Clube</th>
+                                <th class="p-2">Valor</th>
+                                <th class="p-2 text-center">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transfer-list-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
         
@@ -448,6 +492,19 @@
                 </div>
                 <div id="sim-timer" class="text-center text-3xl font-mono mb-4 bg-black bg-opacity-25 rounded-lg py-1">00:00</div>
                 <div id="match-simulation-narrative" class="bg-gray-900 rounded-lg p-4 h-64 overflow-y-auto text-sm"></div>
+                
+                <div id="live-match-controls" class="mt-4">
+                    <div class="mb-3">
+                        <label for="mentality-slider" class="block text-center text-sm font-medium text-gray-300 mb-1">Mentalidade</label>
+                        <div class="flex items-center gap-x-2 text-xs text-muted">
+                            <span>Defensiva</span>
+                            <input type="range" id="mentality-slider" min="1" max="5" value="3" class="mentality-slider">
+                            <span>Ofensiva</span>
+                        </div>
+                    </div>
+                    <div id="interactive-event-controls" class="hidden grid grid-cols-3 gap-2 text-center">
+                        </div>
+                </div>
                 <div class="mt-6 flex gap-4">
                     <button id="substitution-button" class="hidden w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-lg transition-transform transform hover:scale-105">Substituir</button>
                     <button id="finish-match-button" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-transform transform hover:scale-105">Continuar</button>
@@ -456,7 +513,6 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <div id="quick-sim-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div id="quick-sim-content" class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-lg"></div>
     </div>
@@ -533,7 +589,6 @@
         </div>
     </div>
     
-    <!-- Fired Modal -->
     <div id="fired-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom max-w-sm">
             <h3 class="text-2xl font-bold mb-4 text-red-500">DEMITIDO!</h3>
@@ -553,7 +608,7 @@
 
 <script>
 // ===================================================================================
-// JOGO CBFD 25 - LÓGICA PRINCIPAL (v8.0 - Update de Gestão)
+// JOGO CBFD 25 - LÓGICA PRINCIPAL (v8.3 - Update Interativo)
 // ===================================================================================
 
 // -----------------------------------------------------------------------------------
@@ -563,7 +618,8 @@ let gameState = {};
 let simulationState = {
     interval: null, minute: 0, paused: false, matchData: null,
     homeTeam: null, awayTeam: null, homeGoals: 0, awayGoals: 0,
-    events: [], eventIndex: 0
+    events: [], eventIndex: 0,
+    interactiveEventTriggered: false // Flag para eventos interativos
 };
 let substitutionState = {
     selectedStarter: null, selectedBench: null,
@@ -601,13 +657,14 @@ const cbfdTeams = [
     { name: "CR Porcos", logo: 'CP', colors: ['#16a34a', '#ffffff'] }, { name: "ACRZ", logo: 'AC', colors: ['#000000', '#dc2626'] },
     { name: "LYNX", logo: 'LX', colors: ['#f59e0b', '#000000'] }, { name: "PORTXZVX", logo: 'PO', colors: ['#ffffff', '#000000'] },
     { name: "VASXCUDO", logo: 'VA', colors: ['#000000', '#ffffff'] }, { name: "Real Chelsea", logo: 'RC', colors: ['#3b82f6', '#ffffff'] },
-    { name: "MONTE VERDE", logo: 'MV', colors: ['#15803d', '#facc15'] }, { name: "FC Madrid", logo: 'FM', colors: ['#ffffff', '#a21caf'] },
+    { name: "MONTE VERDE", logo: 'MV', colors: ['#15803d', '#facc15'] }, { name: "FC Madrid", logo: 'FM', colors: ['#ffffff', '#a21caf'] }, // Nome no código é FC Madrid, mantido
     { name: "Royal Parisian", logo: 'RP', colors: ['#1e3a8a', '#dc2626'] }, { name: "FC Vencedores", logo: 'FV', colors: ['#65a30d', '#ffffff'] },
     { name: "Pazuls FC", logo: 'PA', colors: ['#0ea5e9', '#ffffff'] }, { name: "KIDS FC", logo: 'KI', colors: ['#db2777', '#fefce8'] },
     { name: "FC Corrupção", logo: 'FC', colors: ['#4b5563', '#eab308'] }, { name: "ROMA", logo: 'RO', colors: ['#861a1a', '#f59e0b'] },
     { name: "Real Inter", logo: 'RI', colors: ['#c2410c', '#ffffff'] }, { name: "EC Vitória", logo: 'VI', colors: ['#be123c', '#000000'] },
     { name: "Real Vila", logo: 'RV', colors: ['#1d4ed8', '#ffffff'] }, { name: "Vila Nova", logo: 'VN', colors: ['#b91c1c', '#ffffff'] }
 ];
+
 
 // Fixed Rosters
 const crPorcosRoster = [
@@ -741,12 +798,19 @@ function generateTeam(teamData) {
 function initGame(isNewGame = true) {
     if (isNewGame) {
         gameState = {
-            version: "8.1", // Updated version
+            version: "8.3", // Updated version
             season: 2025, userTeam: null, nextPlayerId: 1,
             difficulty: 'normal',
             budget: 5000000,
+            transferBanSeasons: 0, // NEW: Transfer ban state
             stadium: { level: 1, capacity: 10000 },
-            club: { hasBus: false },
+            club: { 
+                hasBus: false,
+                academyLevel: 1,
+                medicalLevel: 1,
+                marketingLevel: 1,
+                scoutingLevel: 1
+            },
             tactics: { formation: '4-4-2-diamond', style: 'equilibrado' },
             news: [],
             messages: [],
@@ -806,18 +870,25 @@ function initGame(isNewGame = true) {
 // -----------------------------------------------------------------------------------
 function generateAllSchedules() {
     const allNationalTeams = gameState.teams.map(t => t.name);
-    const allContinentalTeams = [...allNationalTeams, ...gameState.southAmericanTeams.map(t => t.name)];
+    // Correctly scope teams for continental competitions
+    const topNationalTeams = allNationalTeams.slice(0, 8); // Example: Top 8 qualify
+    const otherNationalTeams = allNationalTeams.slice(8);
+    const topSouthAmericanTeams = gameState.southAmericanTeams.map(t => t.name).slice(0, 24);
+    
+    const libertadoresTeams = [...topNationalTeams, ...topSouthAmericanTeams.slice(0,24)];
+    const sulamericanaTeams = [...otherNationalTeams, ...gameState.southAmericanTeams.map(t => t.name).slice(0,16)];
+
 
     // National Competitions
     generateLeagueSchedule('CBFD League One', allNationalTeams);
     generateKnockoutSchedule('Copa CBFD', allNationalTeams, 16); // 16 teams for Copa CBFD
     
-    // Continental Competitions (simplified group stage + knockout for now)
-    generateContinentalSchedule('Libertadores CBFD', allContinentalTeams, 32); // 32 teams for Libertadores
-    generateContinentalSchedule('Sulamericana CBFD', allContinentalTeams, 32); // 32 teams for Sulamericana
+    // Continental Competitions
+    generateContinentalSchedule('Libertadores CBFD', libertadoresTeams, 32); // 32 teams for Libertadores
+    generateContinentalSchedule('Sulamericana CBFD', sulamericanaTeams, 32); // 32 teams for Sulamericana
 
     // Pre-season tournament
-    generateKnockoutSchedule('Torneio de Elite CBFD', allNationalTeams, 8); // 8 teams for Elite Tournament
+    generateKnockoutSchedule('Torneio de Elite CBFD', allNationalTeams.slice(0, 8), 8); // Top 8 teams for Elite Tournament
 
     generateFullCalendar();
 }
@@ -909,10 +980,12 @@ function generateFullCalendar() {
     const eliteTournamentStart = new Date(startDate);
     eliteTournamentStart.setDate(eliteTournamentStart.getDate() - 14);
     let eliteCurrentDate = new Date(eliteTournamentStart);
-    gameState.competitions['Torneio de Elite CBFD'].schedule.forEach((roundData, index) => {
-        eliteCurrentDate.setDate(eliteCurrentDate.getDate() + 3); // Matches every 3 days
-        gameState.calendar.push({ ...roundData, date: new Date(eliteCurrentDate) });
-    });
+    if(gameState.competitions['Torneio de Elite CBFD'].schedule.length > 0) {
+        gameState.competitions['Torneio de Elite CBFD'].schedule.forEach((roundData, index) => {
+            eliteCurrentDate.setDate(eliteCurrentDate.getDate() + 3); // Matches every 3 days
+            gameState.calendar.push({ ...roundData, date: new Date(eliteCurrentDate) });
+        });
+    }
 
     // CBFD League One (main season)
     gameState.competitions['CBFD League One'].schedule.forEach((roundData, index) => {
@@ -930,10 +1003,12 @@ function generateFullCalendar() {
     // Libertadores CBFD & Sulamericana CBFD (interspersed)
     let continentalCurrentDate = new Date(startDate);
     ['Libertadores CBFD', 'Sulamericana CBFD'].forEach(compKey => {
-        gameState.competitions[compKey].schedule.forEach((roundData, index) => {
-            continentalCurrentDate.setDate(continentalCurrentDate.getDate() + getRandomInt(7, 14)); // Matches every 1-2 weeks
-            gameState.calendar.push({ ...roundData, date: new Date(continentalCurrentDate) });
-        });
+        if (gameState.competitions[compKey] && gameState.competitions[compKey].schedule.length > 0) {
+            gameState.competitions[compKey].schedule.forEach((roundData, index) => {
+                continentalCurrentDate.setDate(continentalCurrentDate.getDate() + getRandomInt(7, 14)); // Matches every 1-2 weeks
+                gameState.calendar.push({ ...roundData, date: new Date(continentalCurrentDate) });
+            });
+        }
     });
 
     // Sort calendar by date
@@ -944,24 +1019,30 @@ function generateFullCalendar() {
 function updateAllTables() {
     updateLeagueTable('CBFD League One');
     // Update other competition tables/brackets as needed
-    // For knockout, we only update the bracket structure, not a "table"
-    // For continental, group stage tables need to be updated
 }
 
 function updateLeagueTable(compKey) {
     const comp = gameState.competitions[compKey];
-    if (!comp) return;
+    if (!comp || !comp.schedule || comp.schedule.length === 0) return;
 
     const table = {};
-    const allPlayers = [];
-    // Combine national and South American teams for player tracking
-    [...gameState.teams, ...gameState.southAmericanTeams].forEach(team => {
-        table[team.name] = { name: team.name, logo: team.logo, p: 0, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0 };
-        allPlayers.push(...team.players);
+    
+    // CORRECTION: Initialize table only with teams participating in this specific competition
+    const participatingTeams = new Set(
+        comp.schedule.flatMap(round => round.matches).flatMap(match => [match.home, match.away])
+    );
+
+    participatingTeams.forEach(teamName => {
+        const team = findTeam(teamName);
+        if(team) {
+            table[team.name] = { name: team.name, logo: team.logo, p: 0, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0 };
+        }
     });
 
+    const allPlayers = [...gameState.teams, ...gameState.southAmericanTeams].flatMap(t => t.players);
+
     comp.schedule.forEach(round => round.matches.forEach(match => {
-        if (match.result && match.comp === compKey) { // Ensure we only process matches for this specific competition
+        if (match.result && match.comp === compKey) {
             const home = table[match.home]; const away = table[match.away];
             if (!home || !away) return;
             const [hG, aG] = match.result;
@@ -975,10 +1056,11 @@ function updateLeagueTable(compKey) {
     comp.table = Object.values(table).sort((a, b) => b.p - a.p || b.sg - a.sg || b.gp - a.gp || a.name.localeCompare(b.name));
     
     comp.topScorers = allPlayers
-        .filter(p => p.seasonGoals > 0) // This needs to be specific to the competition
+        .filter(p => p.seasonGoals > 0 && participatingTeams.has(p.teamName))
         .sort((a, b) => b.seasonGoals - a.seasonGoals || a.seasonMatches - b.seasonMatches)
         .slice(0, 15);
 }
+
 
 // New: Update knockout bracket
 function updateKnockoutBracket(compKey, winner, loser, roundName) {
@@ -1010,8 +1092,14 @@ function updateKnockoutBracket(compKey, winner, loser, roundName) {
                     break;
                 }
             }
-            if (!addedToNextRound) { // Should not happen if bracket is correctly sized
-                nextRound.matches.push({ home: winner, away: null, winner: null });
+            if (!addedToNextRound) {
+                const newMatchIndex = Math.floor(nextRound.matches.length / 2);
+                if (nextRound.matches[newMatchIndex]) {
+                    if(!nextRound.matches[newMatchIndex].home) nextRound.matches[newMatchIndex].home = winner;
+                    else nextRound.matches[newMatchIndex].away = winner;
+                } else {
+                     nextRound.matches.push({ home: winner, away: null, winner: null });
+                }
             }
         } else {
             comp.winner = winner; // This is the final match
@@ -1045,9 +1133,9 @@ function showScreen(screenId) {
     else if (screenId === 'newspapers') renderNewspapers();
     else if (screenId === 'finances') renderFinances();
     else if (screenId === 'messages') renderMessages();
-    // New: Render specific competition screens
     else if (screenId.startsWith('comp-')) {
-        renderCompetitionDetails(screenId.replace('comp-', ''));
+        const compKey = screenId.substring(5); // Get comp key from id
+        renderCompetitionDetails(compKey);
     }
 }
 
@@ -1058,6 +1146,18 @@ function updateCareerDashboard() {
     document.getElementById('current-season').innerText = gameState.season;
     document.getElementById('budget-display').innerText = formatCurrency(gameState.budget);
     
+    // Handle transfer ban UI
+    const transferButton = document.getElementById('transfers-button');
+    if (gameState.transferBanSeasons > 0) {
+        transferButton.disabled = true;
+        transferButton.classList.add('opacity-50', 'cursor-not-allowed');
+        transferButton.title = `Proibido de fazer transferências por mais ${gameState.transferBanSeasons} temporada(s).`;
+    } else {
+        transferButton.disabled = false;
+        transferButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        transferButton.title = '';
+    }
+
     const unreadMessages = gameState.messages.filter(m => !m.read).length;
     const notification = document.getElementById('message-notification');
     if (unreadMessages > 0) {
@@ -1091,7 +1191,7 @@ function updateCareerDashboard() {
 }
 
 // -----------------------------------------------------------------------------------
-// SIMULAÇÃO DE PARTIDA
+// SIMULAÇÃO DE PARTIDA (LÓGICA CORRIGIDA)
 // -----------------------------------------------------------------------------------
 function getTeamStrength(team, players) {
     const currentPlayers = players || team.players.slice(0, 11);
@@ -1103,7 +1203,7 @@ function getTeamStrength(team, players) {
     currentPlayers.forEach(p => {
         if (p.suspended > 0) return;
         const moraleFactor = p.morale / 100;
-        const fitnessFactor = (p.fitness / 100) * 0.7 + 0.3;
+        const fitnessFactor = (p.fitness / 100) * 0.7 + 0.3; // Fitness has less impact than morale
         const effectiveOverall = p.overall * moraleFactor * fitnessFactor;
         const normalizedPos = normalizePosition(p.position);
 
@@ -1131,11 +1231,16 @@ function getTeamStrength(team, players) {
         defenseModifier = 1.15;
     }
 
+    const avgAttack = (baseAttack / currentPlayers.length) * attackModifier;
+    const avgDefense = (baseDefense / currentPlayers.length) * defenseModifier;
+    
+    // Normalize to a 0-100 scale for easier calculation
     return { 
-        attack: (baseAttack / currentPlayers.length) * attackModifier, 
-        defense: (baseDefense / currentPlayers.length) * defenseModifier
+        attack: Math.min(100, avgAttack), 
+        defense: Math.min(100, avgDefense)
     };
 }
+
 
 function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
     const homeStarters = homeTeam.players.slice(0, 11).map(p => ({...p, teamName: homeTeam.name}));
@@ -1143,86 +1248,83 @@ function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
     const events = [];
     let homeGoals = 0, awayGoals = 0;
     
-    const homeStrength = getTeamStrength(homeTeam, homeStarters);
-    const awayStrength = getTeamStrength(awayTeam, awayStarters);
+    let homeStrength = getTeamStrength(homeTeam, homeStarters);
+    let awayStrength = getTeamStrength(awayTeam, awayStarters);
 
-    // Apply difficulty modifiers
-    if (homeTeam.isUserTeam) {
-        if (gameState.difficulty === 'goat') awayStrength.attack *= 1.1; // Opponent stronger
-        else if (gameState.difficulty === 'easy') awayStrength.attack *= 0.9; // Opponent weaker
+    // Vantagem de casa
+    const homeAdvantage = 1.08; // 8% de bônus para o time da casa
+    homeStrength.attack *= homeAdvantage;
+
+    // Modificadores de Dificuldade
+    let difficultyModifier = 1.0;
+    if (gameState.userTeam) {
+        if (homeTeam.name === gameState.userTeam) {
+            if (gameState.difficulty === 'easy') difficultyModifier = 1.2;
+            if (gameState.difficulty === 'goat') difficultyModifier = 0.85;
+            homeStrength.attack *= difficultyModifier;
+        } else if (awayTeam.name === gameState.userTeam) {
+            if (gameState.difficulty === 'easy') difficultyModifier = 1.2;
+            if (gameState.difficulty === 'goat') difficultyModifier = 0.85;
+            awayStrength.attack *= difficultyModifier;
+        }
     }
-    if (awayTeam.isUserTeam) {
-        if (gameState.difficulty === 'goat') homeStrength.attack *= 1.1; // Opponent stronger
-        else if (gameState.difficulty === 'easy') homeStrength.attack *= 0.9; // Opponent weaker
-    }
+
+    // Fator de pontuação: compara o ataque de um time com a defesa do outro
+    // Um valor de 1.0 significa um confronto equilibrado. >1.0 é vantagem, <1.0 é desvantagem.
+    const homeScoreFactor = Math.max(0.2, homeStrength.attack / awayStrength.defense);
+    const awayScoreFactor = Math.max(0.2, awayStrength.attack / homeStrength.defense);
 
     if (isQuickSim) {
-        // Simplified quick simulation based on strength
-        const homeOverallStrength = homeStrength.attack * 0.7 + homeStrength.defense * 0.3;
-        const awayOverallStrength = awayStrength.attack * 0.7 + awayStrength.defense * 0.3;
+        const baseExpectedGoals = 1.4; // Média de gols por time em um jogo equilibrado
+        let homeExpectedGoals = baseExpectedGoals * homeScoreFactor;
+        let awayExpectedGoals = baseExpectedGoals * awayScoreFactor;
+        
+        // Adiciona aleatoriedade, mas baseada na expectativa
+        homeGoals = Math.floor(homeExpectedGoals + Math.random() * 2);
+        awayGoals = Math.floor(awayExpectedGoals + Math.random() * 2);
 
-        let homeExpectedGoals = homeOverallStrength / 100;
-        let awayExpectedGoals = awayOverallStrength / 100;
-
-        // Add randomness
-        homeExpectedGoals += (Math.random() - 0.5) * 1.5;
-        awayExpectedGoals += (Math.random() - 0.5) * 1.5;
-
-        homeGoals = Math.max(0, Math.round(homeExpectedGoals));
-        awayGoals = Math.max(0, Math.round(awayExpectedGoals));
-
-        // Ensure not always 0-0 unless both teams are very weak
-        if (homeGoals === 0 && awayGoals === 0 && (homeOverallStrength > 50 || awayOverallStrength > 50)) {
-            if (Math.random() < 0.5) homeGoals = 1; else awayGoals = 1;
-        }
-
-        // Add some goal events for quick sim news
-        for(let i=0; i<homeGoals; i++) events.push({ type: 'goal', team: homeTeam.name, playerId: getRandom(homeStarters).id, minute: getRandomInt(1, 90) });
-        for(let i=0; i<awayGoals; i++) events.push({ type: 'goal', team: awayTeam.name, playerId: getRandom(awayStarters).id, minute: getRandomInt(1, 90) });
-        events.sort((a,b) => a.minute - b.minute);
+        // Gera eventos de gol para o log
+        for(let i = 0; i < homeGoals; i++) events.push({ type: 'goal', team: homeTeam.name, playerId: getRandom(homeStarters).id, minute: getRandomInt(1, 90) });
+        for(let i = 0; i < awayGoals; i++) events.push({ type: 'goal', team: awayTeam.name, playerId: getRandom(awayStarters).id, minute: getRandomInt(1, 90) });
 
     } else {
-        // Detailed narrated simulation
+        const goalChanceBase = 0.018; // Chance base de gol por minuto para um scoreFactor de 1.0
+        // Medical center reduces injury chance
+        const injuryChanceModifier = 1 - (gameState.club.medicalLevel * 0.05);
+
         for (let minute = 1; minute <= 90; minute++) {
-            // Goal chances
-            const homeAttackPower = Math.max(0, homeStrength.attack - awayStrength.defense);
-            if (Math.random() < homeAttackPower / 1500) {
+            // Chance de Gol
+            if (Math.random() < goalChanceBase * homeScoreFactor) {
                 homeGoals++;
                 const scorer = getRandom(homeStarters.filter(p => normalizePosition(p.position) !== 'GOL'));
                 events.push({ minute, type: 'goal', team: homeTeam.name, player: scorer.name, playerId: scorer.id, score: `${homeGoals} - ${awayGoals}` });
             }
-            
-            const awayAttackPower = Math.max(0, awayStrength.attack - homeStrength.defense);
-            if (Math.random() < awayAttackPower / 1500) {
+            if (Math.random() < goalChanceBase * awayScoreFactor) {
                 awayGoals++;
                 const scorer = getRandom(awayStarters.filter(p => normalizePosition(p.position) !== 'GOL'));
                 events.push({ minute, type: 'goal', team: awayTeam.name, player: scorer.name, playerId: scorer.id, score: `${homeGoals} - ${awayGoals}` });
             }
 
-            // Card and Injury chances
-            if (Math.random() < 0.01) { // Yellow card chance
+            // Chances de Cartões e Lesões (mantido como estava)
+            if (Math.random() < 0.01) {
                  const player = getRandom([...homeStarters, ...awayStarters]);
                  events.push({ minute, type: 'card-yellow', team: player.teamName, player: player.name, playerId: player.id });
             }
-            if (Math.random() < 0.002) { // Red card chance
+            if (Math.random() < 0.002) {
                  const player = getRandom([...homeStarters, ...awayStarters]);
                  events.push({ minute, type: 'card-red', team: player.teamName, player: player.name, playerId: player.id });
             }
-            if (Math.random() < 0.005) { // Injury chance
+            if (Math.random() < (0.005 * injuryChanceModifier) && player.injuryProne) {
                  const player = getRandom([...homeStarters, ...awayStarters]);
-                 if (player.injuryProne && Math.random() < 0.5) {
-                    const turns = getRandomInt(2, 4);
-                    events.push({ minute, type: 'injury', team: player.teamName, player: player.name, playerId: player.id, turns });
-                 } else {
-                    const turns = getRandomInt(1, 2);
-                    events.push({ minute, type: 'injury', team: player.teamName, player: player.name, playerId: player.id, turns });
-                 }
+                 const turns = getRandomInt(1, (player.injuryProne ? 4 : 2));
+                 events.push({ minute, type: 'injury', team: player.teamName, player: player.name, playerId: player.id, turns });
             }
         }
     }
     
     return { homeGoals, awayGoals, events: events.sort((a,b) => a.minute - b.minute) };
 }
+
 
 function startNarratedSimulation(matchData) {
     const homeTeam = findTeam(matchData.match.home);
@@ -1234,7 +1336,8 @@ function startNarratedSimulation(matchData) {
         homeTeam, awayTeam,
         homeGoals: 0, awayGoals: 0,
         events: matchResult.events,
-        eventIndex: 0
+        eventIndex: 0,
+        interactiveEventTriggered: false
     };
 
     document.getElementById('sim-home-team').innerHTML = `${getTeamLogoSVG(homeTeam.logoText, homeTeam.colors[0], homeTeam.colors[1], 'w-20 h-20 mx-auto')} <p class="font-bold text-lg mt-2">${homeTeam.name}</p>`;
@@ -1244,6 +1347,9 @@ function startNarratedSimulation(matchData) {
     document.getElementById('match-simulation-narrative').innerHTML = '';
     document.getElementById('finish-match-button').classList.add('hidden');
     document.getElementById('substitution-button').classList.add('hidden');
+    document.getElementById('interactive-event-controls').classList.add('hidden');
+    document.getElementById('mentality-slider').value = 3;
+    
     
     // Add classes for fullscreen gameplay
     document.documentElement.classList.add('playing');
@@ -1257,6 +1363,8 @@ function startNarratedSimulation(matchData) {
 
 function resumeSimulation() {
     simulationState.paused = false;
+    document.getElementById('interactive-event-controls').classList.add('hidden');
+
     simulationState.interval = setInterval(() => {
         if (simulationState.paused) return;
 
@@ -1264,6 +1372,15 @@ function resumeSimulation() {
         document.getElementById('sim-timer').innerText = `${String(simulationState.minute).padStart(2, '0')}:00`;
 
         const narrativeDiv = document.getElementById('match-simulation-narrative');
+
+        // Check for Interactive Event Trigger
+        const isUserMatch = simulationState.homeTeam.isUserTeam || simulationState.awayTeam.isUserTeam;
+        if (isUserMatch && !simulationState.interactiveEventTriggered && Math.random() < 0.10) { // 10% chance per minute to trigger
+            simulationState.interactiveEventTriggered = true;
+            pauseSimulation();
+            triggerInteractiveEvent();
+            return;
+        }
 
         if (simulationState.minute === 45 && !simulationState.paused) {
             narrativeDiv.innerHTML += `<p class="match-event narrative-event"><strong>45'</strong>: Intervalo!</p>`;
@@ -1319,6 +1436,10 @@ function resumeSimulation() {
             document.getElementById('finish-match-button').classList.remove('hidden');
             document.getElementById('finish-match-button').onclick = () => finishMatch();
         }
+         // Reset trigger for next opportunity
+        if (simulationState.minute % 5 === 0) {
+            simulationState.interactiveEventTriggered = false;
+        }
     }, 50);
 }
 
@@ -1326,6 +1447,103 @@ function pauseSimulation() {
     clearInterval(simulationState.interval);
     simulationState.paused = true;
 }
+
+
+// -----------------------------------------------------------------------------------
+// LÓGICA DE PARTIDA INTERATIVA
+// -----------------------------------------------------------------------------------
+function triggerInteractiveEvent() {
+    const userTeam = findTeam(gameState.userTeam);
+    const opponentTeam = simulationState.homeTeam.isUserTeam ? simulationState.awayTeam : simulationState.homeTeam;
+    const controlsDiv = document.getElementById('interactive-event-controls');
+    
+    // Decide if it's an attacking or defensive event for the user
+    const isAttackingEvent = Math.random() < 0.6; // 60% chance of being an attack
+
+    let narrativeText = '';
+    controlsDiv.innerHTML = ''; // Clear previous buttons
+
+    if (isAttackingEvent) {
+        const attacker = getRandom(userTeam.players.filter(p => normalizePosition(p.position) !== 'GOL'));
+        narrativeText = `${attacker.name} avança com a bola! O que você faz?`;
+        controlsDiv.innerHTML = `
+            <button onclick="handleInteractiveAction('pass', ${attacker.id})" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm">Passe</button>
+            <button onclick="handleInteractiveAction('dribble', ${attacker.id})" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-lg text-sm">Drible</button>
+            <button onclick="handleInteractiveAction('shoot', ${attacker.id})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-sm">Chute</button>
+        `;
+    } else { // Defensive Event
+        const defender = getRandom(userTeam.players.filter(p => normalizePosition(p.position) !== 'ATA'));
+        narrativeText = `O adversário ataca! Como a defesa deve se postar?`;
+        controlsDiv.innerHTML = `
+            <button onclick="handleInteractiveAction('press', ${defender.id})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg text-sm">Pressionar</button>
+            <button onclick="handleInteractiveAction('contain', ${defender.id})" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg text-sm">Recuar</button>
+            <button onclick="handleInteractiveAction('tackle', ${defender.id})" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg text-sm">Dar o Bote</button>
+        `;
+    }
+
+    const narrativeDiv = document.getElementById('match-simulation-narrative');
+    narrativeDiv.innerHTML += `<p class="match-event interactive-event"><strong>${simulationState.minute}'</strong>: <i class="fas fa-star text-yellow-400"></i> ${narrativeText}</p>`;
+    narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+    controlsDiv.classList.remove('hidden');
+}
+
+function handleInteractiveAction(action, playerId) {
+    const userTeam = findTeam(gameState.userTeam);
+    const player = userTeam.players.find(p => p.id === playerId);
+    const opponentTeam = simulationState.homeTeam.isUserTeam ? simulationState.awayTeam : simulationState.homeTeam;
+    const opponentPlayer = getRandom(opponentTeam.players);
+    const narrativeDiv = document.getElementById('match-simulation-narrative');
+
+    const mentalityValue = parseInt(document.getElementById('mentality-slider').value); // 1 to 5
+    // mentality bonus: from -0.2 (defensive) to +0.2 (offensive)
+    const mentalityBonus = (mentalityValue - 3) * 0.1; 
+
+    // Base success chance is 60% stats, 40% random
+    // We compare player OVR vs opponent OVR
+    let statDifference = (player.overall - opponentPlayer.overall) / 100; // e.g., +0.1 if 10 OVR higher
+    
+    // Adjust stat difference based on action
+    if (['pass', 'dribble', 'shoot'].includes(action)) {
+        statDifference += mentalityBonus; // Offensive actions get bonus from offensive mentality
+    } else {
+        statDifference -= mentalityBonus; // Defensive actions get bonus from defensive mentality
+    }
+
+    const successChance = 0.5 + (statDifference * 0.6); // Base 50%, stats can swing it
+    const outcome = Math.random() < successChance;
+
+    let resultText = '';
+    if (outcome) { // SUCCESS
+        switch(action) {
+            case 'pass': resultText = `Bom passe de ${player.name}! O time mantém a posse.`; break;
+            case 'dribble': resultText = `${player.name} passa pelo marcador com um belo drible!`; break;
+            case 'shoot':
+                simulationState.homeTeam.isUserTeam ? simulationState.homeGoals++ : simulationState.awayGoals++;
+                resultText = `<strong>GOLAAAAÇO!</strong> ${player.name} finaliza com precisão!`;
+                player.seasonGoals++;
+                document.getElementById('sim-score').innerText = `${simulationState.homeGoals} - ${simulationState.awayGoals}`;
+                break;
+            case 'press': resultText = `Pressão funciona e ${player.name} força o erro do adversário!`; break;
+            case 'contain': resultText = `A defesa se segura bem e neutraliza a jogada.`; break;
+            case 'tackle': resultText = `Bote perfeito de ${player.name}, a bola é recuperada!`; break;
+        }
+    } else { // FAILURE
+         switch(action) {
+            case 'pass': resultText = `Passe interceptado! ${player.name} errou.`; break;
+            case 'dribble': resultText = `Drible sem sucesso, ${player.name} é desarmado.`; break;
+            case 'shoot': resultText = `Chute pra fora! ${player.name} desperdiça a chance.`; break;
+            case 'press': resultText = `O adversário quebra a pressão e avança.`; break;
+            case 'contain': resultText = `A defesa é muito passiva e cede espaço.`; break;
+            case 'tackle': resultText = `Falta! ${player.name} erra o bote. Cartão amarelo.`; break;
+        }
+    }
+    
+    narrativeDiv.innerHTML += `<p class="match-event narrative-event">${resultText}</p>`;
+    narrativeDiv.scrollTop = narrativeDiv.scrollHeight;
+
+    setTimeout(resumeSimulation, 1500); // Wait a bit before resuming
+}
+
 
 // -----------------------------------------------------------------------------------
 // LÓGICA DE SUBSTITUIÇÃO E TÁTICAS
@@ -1473,9 +1691,9 @@ function executeRoundSimulation(round, isQuickSim) {
             processMatchEvents(homeTeam, awayTeam, result.events, match.comp); // Pass competition type
             
             // Handle knockout winners
-            if (match.comp === 'Copa CBFD' || match.comp === 'Torneio de Elite CBFD' || match.comp === 'Super Copa CBFD' || match.comp === 'Recopa CBFD' || match.comp.startsWith('Eliminatórias')) {
-                const winner = result.homeGoals > result.awayGoals ? match.home : match.away;
-                const loser = result.homeGoals > result.awayGoals ? match.away : match.home;
+            if (match.comp === 'Copa CBFD' || match.comp === 'Torneio de Elite CBFD' || match.comp === 'Super Copa CBFD' || match.comp === 'Recopa CBFD' || round.type.includes('Eliminatórias')) {
+                const winner = result.homeGoals > result.awayGoals ? match.home : (result.awayGoals > result.homeGoals ? match.away : (Math.random() < 0.5 ? match.home : match.away)); // Coin toss on draw
+                const loser = winner === match.home ? match.away : match.home;
                 updateKnockoutBracket(match.comp, winner, loser, round.round);
             }
         }
@@ -1497,14 +1715,15 @@ function processMatchEvents(homeTeam, awayTeam, events, compKey) {
             case 'goal':
                 player.seasonGoals = (player.seasonGoals || 0) + 1;
                 // Update competition specific top scorers
-                if (!gameState.competitions[compKey].topScorers) {
-                    gameState.competitions[compKey].topScorers = [];
-                }
-                const existingScorer = gameState.competitions[compKey].topScorers.find(s => s.id === player.id);
-                if (existingScorer) {
-                    existingScorer.goals = (existingScorer.goals || 0) + 1;
-                } else {
-                    gameState.competitions[compKey].topScorers.push({ id: player.id, name: player.name, teamName: player.teamName, goals: 1 });
+                const comp = gameState.competitions[compKey];
+                if (comp) {
+                    if (!comp.topScorers) comp.topScorers = [];
+                    const existingScorer = comp.topScorers.find(s => s.id === player.id);
+                    if (existingScorer) {
+                        existingScorer.goals = (existingScorer.goals || 0) + 1;
+                    } else {
+                        comp.topScorers.push({ id: player.id, name: player.name, teamName: player.teamName, goals: 1 });
+                    }
                 }
                 player.morale = Math.min(100, player.morale + 5);
                 break;
@@ -1585,44 +1804,61 @@ function processRoundEnd(round) {
 // -----------------------------------------------------------------------------------
 function openEndOfSeasonFlow() {
     const comp = gameState.competitions['CBFD League One'];
-    comp.winner = comp.table[0].name;
-    gameState.champions['CBFD League One'] = comp.winner;
+    if (comp && comp.table.length > 0) {
+        comp.winner = comp.table[0].name;
+        gameState.champions['CBFD League One'] = comp.winner;
+    }
 
-    // Determine Copa CBFD winner
     const copaComp = gameState.competitions['Copa CBFD'];
-    copaComp.winner = copaComp.bracket[copaComp.bracket.length - 1].matches[0].winner;
-    gameState.champions['Copa CBFD'] = copaComp.winner;
+    if (copaComp && copaComp.bracket.length > 0) {
+        copaComp.winner = copaComp.bracket[copaComp.bracket.length - 1]?.matches[0]?.winner;
+        gameState.champions['Copa CBFD'] = copaComp.winner;
+    }
 
-    // Determine Libertadores CBFD winner
     const libComp = gameState.competitions['Libertadores CBFD'];
-    libComp.winner = libComp.bracket.length > 0 ? libComp.bracket[libComp.bracket.length - 1].matches[0].winner : null;
-    gameState.champions['Libertadores CBFD'] = libComp.winner;
+    if (libComp && libComp.bracket.length > 0) {
+        libComp.winner = libComp.bracket[libComp.bracket.length - 1]?.matches[0]?.winner;
+        gameState.champions['Libertadores CBFD'] = libComp.winner;
+    }
 
-    // Determine Sulamericana CBFD winner
     const sulComp = gameState.competitions['Sulamericana CBFD'];
-    sulComp.winner = sulComp.bracket.length > 0 ? sulComp.bracket[sulComp.bracket.length - 1].matches[0].winner : null;
-    gameState.champions['Sulamericana CBFD'] = sulComp.winner;
+    if (sulComp && sulComp.bracket.length > 0) {
+        sulComp.winner = sulComp.bracket[sulComp.bracket.length - 1]?.matches[0]?.winner;
+        gameState.champions['Sulamericana CBFD'] = sulComp.winner;
+    }
     
     const topScorer = comp.topScorers[0];
     const bestPlayer = [...gameState.teams, ...gameState.southAmericanTeams].flatMap(t => t.players).sort((a,b) => b.overall - a.overall)[0];
     const bestManager = comp.winner;
 
     let summary = `
-        <p>Campeão da Liga: <strong class="text-yellow-400">${comp.winner}</strong></p>
-        <p>Campeão da Copa CBFD: <strong class="text-yellow-400">${copaComp.winner || 'Ainda não definido'}</strong></p>
-        <p>Campeão da Libertadores CBFD: <strong class="text-yellow-400">${libComp.winner || 'Ainda não definido'}</strong></p>
-        <p>Campeão da Sulamericana CBFD: <strong class="text-yellow-400">${sulComp.winner || 'Ainda não definido'}</strong></p>
+        <p>Campeão da Liga: <strong class="text-yellow-400">${comp.winner || 'Não definido'}</strong></p>
+        <p>Campeão da Copa CBFD: <strong class="text-yellow-400">${copaComp.winner || 'Não definido'}</strong></p>
+        <p>Campeão da Libertadores CBFD: <strong class="text-yellow-400">${libComp.winner || 'Não definido'}</strong></p>
+        <p>Campeão da Sulamericana CBFD: <strong class="text-yellow-400">${sulComp.winner || 'Não definido'}</strong></p>
         <div class="border-t border-custom my-3"></div>
         <p>Melhor Jogador: <strong>${bestPlayer.name}</strong> (${bestPlayer.teamName})</p>
         <p>Artilheiro: <strong>${topScorer ? topScorer.name : 'N/A'}</strong> (${topScorer ? topScorer.teamName : ''}) - ${topScorer ? topScorer.seasonGoals : 0} gols</p>
-        <p>Melhor Técnico: <strong>Técnico do ${bestManager}</strong></p>
+        <p>Melhor Técnico: <strong>Técnico do ${bestManager || 'N/A'}</strong></p>
     `;
     document.getElementById('end-of-season-summary').innerHTML = summary;
     openModal('end-of-season-modal');
 }
 
 function startNewSeason() {
+    // CORRECTION: Reset key game state variables for a clean start
     gameState.season++;
+    gameState.news = [];
+    gameState.messages = [];
+    gameState.transactions = [];
+    gameState.consecutiveFailures = 0;
+    if (gameState.transferBanSeasons > 0) gameState.transferBanSeasons--; // Decrement transfer ban
+    
+    // Marketing Investment bonus
+    const marketingBonus = 1 + (gameState.club.marketingLevel * 0.05);
+    gameState.sponsorship.main.value = Math.round(500000 * marketingBonus);
+
+
     Object.values(gameState.competitions).forEach(c => {
         if (c.schedule) {
             c.schedule = []; c.table = []; c.bracket = []; c.topScorers = []; c.winner = null; c.currentRound = 0;
@@ -1638,7 +1874,9 @@ function startNewSeason() {
         } else if (p.age < 24) {
             const potentialGap = p.potential - p.overall;
             if (potentialGap > 0) {
-                const increase = getRandomInt(1, Math.min(4, Math.ceil(potentialGap / 3)));
+                // Academy bonus
+                const academyBonus = Math.floor(gameState.club.academyLevel / 2);
+                const increase = getRandomInt(1, Math.min(4, Math.ceil(potentialGap / 3))) + academyBonus;
                 p.overall += increase;
                 if (p.teamName === gameState.userTeam) {
                     showToast(`${p.name} OVR: ${p.overall - increase} -> ${p.overall}`);
@@ -1647,7 +1885,6 @@ function startNewSeason() {
         }
     }));
     
-    gameState.transactions = [];
     generateAllSchedules(); // Regenerate all schedules for the new season
     
     // Schedule Super Copa CBFD and Recopa CBFD
@@ -1793,11 +2030,21 @@ function loadGame() {
     if (savedGame) {
         gameState = JSON.parse(savedGame);
         // Add any new properties from updates here for backward compatibility
-        gameState.version = gameState.version || "8.1"; // Updated version check
+        gameState.version = gameState.version || "8.3";
+        gameState.transferBanSeasons = gameState.transferBanSeasons || 0;
         gameState.goals = gameState.goals || { leaguePosition: 10, wins: 15 };
         gameState.consecutiveFailures = gameState.consecutiveFailures || 0;
-        gameState.southAmericanTeams = gameState.southAmericanTeams || []; // New property
-        gameState.champions = gameState.champions || { // New property
+        gameState.southAmericanTeams = gameState.southAmericanTeams || []; 
+        if (!gameState.club) {
+             gameState.club = { hasBus: false, academyLevel: 1, medicalLevel: 1, marketingLevel: 1, scoutingLevel: 1 };
+        } else {
+            gameState.club.academyLevel = gameState.club.academyLevel || 1;
+            gameState.club.medicalLevel = gameState.club.medicalLevel || 1;
+            gameState.club.marketingLevel = gameState.club.marketingLevel || 1;
+            gameState.club.scoutingLevel = gameState.club.scoutingLevel || 1;
+        }
+
+        gameState.champions = gameState.champions || { 
             'CBFD League One': null, 'Copa CBFD': null,
             'Libertadores CBFD': null, 'Sulamericana CBFD': null
         };
@@ -1953,21 +2200,53 @@ function renderFullLeagueTable() {
     }
 }
 function renderTransfers() {
-    const transferBody = document.getElementById('transfer-list-body');
-    if (!transferBody) return;
+    const transferContent = document.getElementById('transfer-content');
     document.getElementById('budget-display-transfer').innerText = formatCurrency(gameState.budget);
-    transferBody.innerHTML = '';
-    
-    const searchTerm = document.getElementById('player-search-input').value.toLowerCase();
 
+    // CORRECTION: Check for transfer ban
+    if (gameState.transferBanSeasons > 0) {
+        transferContent.innerHTML = `
+            <div class="text-center p-8 bg-red-900/20 rounded-lg border border-red-500">
+                <i class="fas fa-gavel text-5xl text-red-400 mb-4"></i>
+                <h3 class="text-2xl font-bold text-red-400">Transfer Ban Ativo!</h3>
+                <p class="text-muted mt-2">Seu clube está proibido de realizar transferências por mais <strong>${gameState.transferBanSeasons}</strong> temporada(s) devido a irregularidades.</p>
+            </div>
+        `;
+        return;
+    }
+    // Restore original content if ban is not active
+    transferContent.innerHTML = `
+        <div class="mb-4">
+            <input type="text" id="player-search-input" onkeyup="renderTransfers()" placeholder="Buscar jogador pelo nome..." class="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="bg-card rounded-xl p-4 overflow-x-auto border border-custom">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-muted border-b border-custom">
+                        <th class="p-2">Nome</th><th class="p-2">Pos.</th><th class="p-2 text-center">OVR</th>
+                        <th class="p-2 text-center">Pot.</th><th class="p-2">Clube</th><th class="p-2">Valor</th>
+                        <th class="p-2 text-center">Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="transfer-list-body"></tbody>
+            </table>
+        </div>
+    `;
+
+    const transferBody = document.getElementById('transfer-list-body');
+    const searchTerm = document.getElementById('player-search-input').value.toLowerCase();
+    
     const allPlayersForSale = [...gameState.teams, ...gameState.southAmericanTeams]
         .filter(t => t.name !== gameState.userTeam)
         .flatMap(t => t.players)
-        .filter(p => p.name.toLowerCase().includes(searchTerm)) // Filter by name
+        .filter(p => p.name.toLowerCase().includes(searchTerm))
         .sort((a, b) => b.overall - a.overall)
         .slice(0, 100);
+    
+    const scoutingDiscount = 1 - (gameState.club.scoutingLevel * 0.01);
 
     allPlayersForSale.forEach((player) => {
+        const discountedValue = Math.round(player.marketValue * scoutingDiscount);
         const row = document.createElement('tr');
         row.className = 'border-b border-custom hover:bg-gray-700/50';
         row.innerHTML = `
@@ -1976,7 +2255,7 @@ function renderTransfers() {
             <td class="p-2 text-center font-bold text-green-400">${player.overall}</td>
             <td class="p-2 text-center font-bold text-blue-400">${player.potential}</td>
             <td class="p-2 text-xs">${player.teamName}</td>
-            <td class="p-2 text-sm">${formatCurrency(player.marketValue)}</td>
+            <td class="p-2 text-sm">${formatCurrency(discountedValue)}</td>
             <td class="p-2 text-center"><button onclick="buyPlayer(${player.id}, '${player.teamName}')" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded">Contratar</button></td>`;
         transferBody.appendChild(row);
     });
@@ -1989,8 +2268,10 @@ function buyPlayer(playerId, teamName) {
     if (playerIndex === -1) return;
     
     const player = sellingTeam.players[playerIndex];
+    const scoutingDiscount = 1 - (gameState.club.scoutingLevel * 0.01);
+    const finalPrice = Math.round(player.marketValue * scoutingDiscount);
 
-    if (gameState.budget < player.marketValue) {
+    if (gameState.budget < finalPrice) {
         showMessage('Sem V-Coins', 'Você não tem V-Coins suficientes para contratar este jogador.');
         return;
     }
@@ -2000,8 +2281,8 @@ function buyPlayer(playerId, teamName) {
         return;
     }
     
-    gameState.budget -= player.marketValue;
-    addTransaction(`Compra de ${player.name} (${teamName})`, player.marketValue, 'expense');
+    gameState.budget -= finalPrice;
+    addTransaction(`Compra de ${player.name} (${teamName})`, finalPrice, 'expense');
     
     sellingTeam.players.splice(playerIndex, 1);
     player.teamName = userTeam.name;
@@ -2029,7 +2310,6 @@ function sellPlayer(playerId) {
     gameState.budget += saleValue;
     addTransaction(`Venda de ${player.name}`, saleValue, 'income');
     
-    // Find a random team (national or South American) to sell the player to
     const allPossibleTeams = [...gameState.teams, ...gameState.southAmericanTeams];
     const randomTeam = getRandom(allPossibleTeams.filter(t => t.name !== userTeam.name));
     player.teamName = randomTeam.name;
@@ -2061,13 +2341,11 @@ function renderCompetitionsScreen() {
     grid.innerHTML = '';
     Object.keys(gameState.competitions).forEach(key => {
         const comp = gameState.competitions[key];
-        // Only show competitions that have been scheduled
         if (comp.schedule && comp.schedule.length > 0) {
             const card = document.createElement('div');
             card.className = 'bg-card p-4 rounded-lg cursor-pointer hover:bg-gray-700 transition-all border border-custom';
             card.innerHTML = `<h3 class="font-semibold text-lg">${key}</h3>`;
             card.onclick = () => {
-                // Direct to specific competition detail screen
                 showScreen(`comp-${key}`);
             };
             grid.appendChild(card);
@@ -2075,7 +2353,6 @@ function renderCompetitionsScreen() {
     });
 }
 
-// New: Render Competition Details Screen
 function renderCompetitionDetails(compKey) {
     let compScreen = document.getElementById(`comp-${compKey}`);
     if (!compScreen) {
@@ -2091,9 +2368,7 @@ function renderCompetitionDetails(compKey) {
             <div></div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-card rounded-xl p-4 overflow-x-auto border border-custom" id="comp-main-content-${compKey}">
-                <!-- Content will be dynamically loaded here -->
-            </div>
+            <div class="lg:col-span-2 bg-card rounded-xl p-4 overflow-x-auto border border-custom" id="comp-main-content-${compKey}"></div>
             <div class="lg:col-span-1 bg-card rounded-xl p-4 border border-custom">
                 <h3 class="text-lg font-semibold mb-3">Artilheiros</h3>
                 <div id="comp-top-scorers-${compKey}" class="space-y-2 text-sm max-h-96 overflow-y-auto"></div>
@@ -2105,13 +2380,11 @@ function renderCompetitionDetails(compKey) {
     const mainContentDiv = document.getElementById(`comp-main-content-${compKey}`);
     const topScorersDiv = document.getElementById(`comp-top-scorers-${compKey}`);
 
-    // Render main content (table or bracket)
-    if (comp.table && Object.keys(comp.table).length > 0) { // League-style
+    if (comp.table && comp.table.length > 0) { // League-style
         let tableHtml = `<table class="w-full text-sm"><thead><tr class="text-left text-muted border-b border-custom">
-            <th class="p-2">#</th><th class="p-2">Time</th>
-            <th class="p-2 text-center">P</th><th class="p-2 text-center">J</th>
+            <th class="p-2">#</th><th class="p-2">Time</th><th class="p-2 text-center">P</th><th class="p-2 text-center">J</th>
             <th class="p-2 text-center">V</th><th class="p-2 text-center">E</th><th class="p-2 text-center">D</th>
-            <th class="p-2 text-center">GP</th><th class="p-2 text-center">GC</th><th class="p-2 text-center">SG</th>
+            <th class="p-2 text-center">SG</th>
         </tr></thead><tbody>`;
         comp.table.forEach((team, index) => {
             const isUser = team.name === gameState.userTeam;
@@ -2120,8 +2393,7 @@ function renderCompetitionDetails(compKey) {
                 <td class="p-2 flex items-center">${team.logo.replace('class="team-badge"', 'class="w-6 h-6 mr-3"')} ${team.name}</td>
                 <td class="p-2 text-center font-semibold">${team.p}</td><td class="p-2 text-center">${team.j}</td>
                 <td class="p-2 text-center text-green-400">${team.v}</td><td class="p-2 text-center text-yellow-400">${team.e}</td>
-                <td class="p-2 text-center text-red-400">${team.d}</td><td class="p-2 text-center">${team.gp}</td>
-                <td class="p-2 text-center">${team.gc}</td><td class="p-2 text-center">${team.sg}</td>
+                <td class="p-2 text-center text-red-400">${team.d}</td><td class="p-2 text-center">${team.sg}</td>
             </tr>`;
         });
         tableHtml += `</tbody></table>`;
@@ -2133,19 +2405,18 @@ function renderCompetitionDetails(compKey) {
             round.matches.forEach(match => {
                 const homeTeam = findTeam(match.home);
                 const awayTeam = findTeam(match.away);
-                const winnerText = match.winner ? `Vencedor: ${match.winner}` : 'A definir';
+                const winnerText = match.winner ? `<strong class="text-yellow-400">${match.winner}</strong>` : 'A definir';
                 bracketHtml += `
-                    <div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
-                        <div class="flex items-center">
-                            ${homeTeam ? homeTeam.logo.replace('class="team-badge"', 'class="w-6 h-6 mr-2"') : ''}
-                            <span>${match.home}</span>
+                    <div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center text-sm">
+                        <div class="flex items-center w-2/5">
+                            ${homeTeam ? homeTeam.logo.replace('class="team-badge"', 'class="w-5 h-5 mr-2"') : ''}
+                            <span>${match.home || 'A definir'}</span>
                         </div>
-                        <span>vs</span>
-                        <div class="flex items-center">
-                            <span>${match.away}</span>
-                            ${awayTeam ? awayTeam.logo.replace('class="team-badge"', 'class="w-6 h-6 ml-2"') : ''}
+                        <span class="font-mono">vs</span>
+                        <div class="flex items-center justify-end w-2/5">
+                            <span>${match.away || 'A definir'}</span>
+                            ${awayTeam ? awayTeam.logo.replace('class="team-badge"', 'class="w-5 h-5 ml-2"') : ''}
                         </div>
-                        <span class="font-bold text-sm">${winnerText}</span>
                     </div>
                 `;
             });
@@ -2157,7 +2428,6 @@ function renderCompetitionDetails(compKey) {
         mainContentDiv.innerHTML = `<p class="text-muted">Nenhum dado disponível para esta competição ainda.</p>`;
     }
 
-    // Render top scorers for this competition
     topScorersDiv.innerHTML = '';
     if (comp.topScorers && comp.topScorers.length > 0) {
         comp.topScorers.sort((a, b) => b.goals - a.goals).forEach(player => {
@@ -2220,22 +2490,17 @@ function saveTactics() {
     let isValid = true;
     let errorMessage = `Formação ${formation} inválida. Requisitos:\n`;
 
-    // Combine MEI and MC for validation if needed by the formation rule
-    if (rules.MEI && !rules.MC) { // e.g., 4-3-3
-        counts.MEI += counts.MC;
-    } else if (rules.MC && !rules.MEI) { // e.g., 4-4-2 diamond
-        // No change needed, handled separately
-    } else if (rules.MEI && rules.MC) { // e.g., 4-2-3-1
-        // Handled separately
-    } else { // e.g., 3-5-2 or 5-3-2 where MEI is the main midfield group
-        counts.MEI += counts.MC;
+    const tempCounts = {...counts};
+    if (rules.MEI && !rules.MC) { 
+        tempCounts.MEI += tempCounts.MC;
+    } else if (rules.MEI && rules.MC === undefined) { 
+        tempCounts.MEI += tempCounts.MC;
     }
 
-
     for (const pos in rules) {
-        if (counts[pos] !== rules[pos]) {
+        if (tempCounts[pos] === undefined || tempCounts[pos] !== rules[pos]) {
             isValid = false;
-            errorMessage += `${rules[pos]} ${pos} (você tem ${counts[pos]})\n`;
+            errorMessage += `${rules[pos]} ${pos} (você tem ${tempCounts[pos] || 0})\n`;
         }
     }
 
@@ -2253,19 +2518,19 @@ function renderNewspapers() {
         feed.innerHTML = '<p class="text-muted">Nenhuma notícia ainda. Acompanhe a temporada para as últimas fofocas!</p>';
         return;
     }
-    gameState.news.forEach(newsItem => {
+    gameState.news.slice(0, 30).forEach(newsItem => { // Ensure it doesn't render too many
         feed.innerHTML += `
             <div class="border-b border-custom pb-3 last:border-b-0">
                 <p class="font-semibold text-blue-400">${newsItem.headline}</p>
                 <p class="text-sm mt-1">${newsItem.story}</p>
-                <p class="text-xs text-muted text-right mt-1">${newsItem.source} - ${newsItem.date.toLocaleDateString('pt-BR')}</p>
+                <p class="text-xs text-muted text-right mt-1">${newsItem.source} - ${new Date(newsItem.date).toLocaleDateString('pt-BR')}</p>
             </div>
         `;
     });
 }
 function generateCbfdNews(round, customEvent = null) {
     if (customEvent) {
-        gameState.news.unshift({ ...customEvent, date: new Date() });
+        gameState.news.unshift({ ...customEvent, date: new Date().toISOString() });
     }
 
     const userMatch = round.matches.find(m => m.home === gameState.userTeam || m.away === gameState.userTeam);
@@ -2274,9 +2539,7 @@ function generateCbfdNews(round, customEvent = null) {
         const result = userMatch.result;
         const homeTeamName = userMatch.home;
         const awayTeamName = userMatch.away;
-        const homeTeam = findTeam(homeTeamName);
-        const awayTeam = findTeam(awayTeamName);
-
+        
         let outcome, headline;
         if ((homeTeamName === gameState.userTeam && result[0] > result[1]) || (awayTeamName === gameState.userTeam && result[1] > result[0])) {
             outcome = 'vence'; headline = `VITÓRIA IMPORTANTE!`;
@@ -2286,33 +2549,8 @@ function generateCbfdNews(round, customEvent = null) {
             outcome = 'perde para'; headline = `TROPEÇO INESPERADO!`;
         }
 
-        let goalScorersText = '';
-        const matchEvents = simulationState.events.filter(e => e.type === 'goal');
-        if (matchEvents.length > 0) {
-            const homeScorers = matchEvents.filter(e => e.team === homeTeamName).map(e => `${e.player} (${e.minute}')`).join(', ');
-            const awayScorers = matchEvents.filter(e => e.team === awayTeamName).map(e => `${e.player} (${e.minute}')`).join(', ');
-            
-            if (homeScorers || awayScorers) {
-                goalScorersText = ` Marcadores: `;
-                if (homeScorers) goalScorersText += `${homeTeamName}: ${homeScorers}. `;
-                if (awayScorers) goalScorersText += `${awayTeamName}: ${awayScorers}.`;
-            }
-        }
-
-        const story = `Pela ${round.round}, o ${homeTeamName} ${result[0]} x ${result[1]} ${awayTeamName}. O ${homeTeamName === gameState.userTeam ? 'seu time' : homeTeamName} ${outcome} o ${homeTeamName === gameState.userTeam ? awayTeamName : homeTeamName}. ${goalScorersText} A torcida está ${outcome === 'vence' ? 'em festa' : outcome === 'empata com' ? 'dividida' : 'decepcionada'} com o resultado.`;
-        gameState.news.unshift({ headline, story, source: "Redação CBFD NEWS", date: new Date() });
-    }
-
-    if (Math.random() < 0.6) {
-        const userTeam = findTeam(gameState.userTeam);
-        const randomPlayer = getRandom(userTeam.players);
-        const randomOpponentTeam = getRandom([...gameState.teams, ...gameState.southAmericanTeams].filter(t => t.name !== gameState.userTeam));
-
-        const templates = [
-            { headline: "RUMOR DE MERCADO!", story: `Fontes indicam que ${randomOpponentTeam.name} estaria preparando uma oferta milionária por ${randomPlayer.name}. O presidente do ${gameState.userTeam} declarou: "Não vendemos craques, fazemos história."`, source: "Insider da Bola" },
-            { headline: "CLIMA ESQUENTOU?", story: `O craque ${randomPlayer.name} foi visto discutindo com o roupeiro por causa da cor da nova chuteira. O técnico minimizou o caso: "É a paixão pelo esporte falando mais alto".`, source: "Fofoca FC" }
-        ];
-        gameState.news.unshift({...getRandom(templates), date: new Date()});
+        const story = `Pela ${round.round}, o ${gameState.userTeam} ${outcome} o ${homeTeamName === gameState.userTeam ? awayTeamName : homeTeamName} pelo placar de ${homeTeamName === gameState.userTeam ? result[0] : result[1]} a ${homeTeamName === gameState.userTeam ? result[1] : result[0]}. A torcida está ${outcome === 'vence' ? 'em festa' : outcome === 'empata com' ? 'dividida' : 'decepcionada'} com o resultado.`;
+        gameState.news.unshift({ headline, story, source: "Redação CBFD NEWS", date: new Date().toISOString() });
     }
 
     if (gameState.news.length > 30) {
@@ -2320,30 +2558,61 @@ function generateCbfdNews(round, customEvent = null) {
     }
 }
 function triggerRandomEvent() {
-    if (Math.random() > 0.15) return;
+    if (Math.random() > 0.15) return; // Increased frequency for new events
 
     const userTeam = findTeam(gameState.userTeam);
     const randomPlayer = getRandom(userTeam.players);
 
     const events = [
-        {
+        { // ADJUSTED: Theft event
             id: 'ct_theft',
             condition: () => gameState.budget > 100000,
             action: () => {
-                const loss = Math.floor(gameState.budget * 0.05);
+                const loss = getRandomInt(10000, 50000); // Reduced loss
                 gameState.budget -= loss;
                 addTransaction('Furto no CT', loss, 'expense');
-                const news = { headline: "QUE PREJUÍZO!", story: `Ladrões invadiram o CT do ${gameState.userTeam} e levaram equipamentos. O clube registrou um prejuízo de ${formatCurrency(loss)}.`, source: "Segurança CBFD" };
-                gameState.news.unshift({ ...news, date: new Date() });
+                addMessage('Segurança', `Más notícias. Ocorreu um pequeno furto em nosso CT, resultando em um prejuízo de ${formatCurrency(loss)}.`);
             }
         },
-        {
-            id: 'player_sick',
-            condition: () => userTeam.players.filter(p => p.suspended === 0).length > 18,
+        { // NEW: Positive event
+            id: 'sponsor_bonus',
+            condition: () => true,
             action: () => {
-                randomPlayer.suspended = 1;
-                const news = { headline: "JOGADOR PASSA MAL!", story: `${randomPlayer.name} teve uma intoxicação alimentar e desfalcará o ${gameState.userTeam} no próximo jogo.`, source: "Departamento Médico" };
-                gameState.news.unshift({ ...news, date: new Date() });
+                const bonus = getRandomInt(20000, 60000) * gameState.club.marketingLevel;
+                gameState.budget += bonus;
+                addTransaction('Bônus de Patrocinador', bonus, 'income');
+                const news = { headline: "RECEITA EXTRA!", story: `O patrocinador master LUCCABET ficou satisfeito com a visibilidade recente e concedeu um bônus de ${formatCurrency(bonus)} ao ${gameState.userTeam}!`, source: "Marketing CBFD" };
+                generateCbfdNews(null, news);
+                addMessage('Diretoria Financeira', `Excelente notícia! Recebemos um bônus de ${formatCurrency(bonus)} do nosso patrocinador. Use com sabedoria!`);
+            }
+        },
+        { // NEW: Transfer Ban event
+            id: 'transfer_ban',
+            condition: () => gameState.budget < -100000 && gameState.transferBanSeasons === 0,
+            action: () => {
+                const banDuration = getRandomInt(1, 2);
+                gameState.transferBanSeasons = banDuration;
+                addMessage('Comitê Disciplinar CBFD', `Atenção! Devido a graves irregularidades financeiras, o ${gameState.userTeam} está proibido de registrar novos jogadores por ${banDuration} temporada(s).`);
+            }
+        },
+        { // NEW: Investment event (positive)
+            id: 'academy_prodigy',
+            condition: () => gameState.club.academyLevel > 2,
+            action: () => {
+                const newPlayer = generatePlayer(gameState.nextPlayerId++, null, gameState.userTeam, true);
+                newPlayer.potential = getRandomInt(92, 95); // High potential
+                userTeam.players.push(newPlayer);
+                addMessage('Olheiro Chefe', `Chefe, nossa academia aprimorada descobriu um talento geracional! ${newPlayer.name} se juntou ao time. O potencial dele é incrível!`);
+            }
+        },
+        { // NEW: Investment event (negative)
+            id: 'medical_fail',
+            condition: () => gameState.club.medicalLevel < 3,
+            action: () => {
+                const cost = getRandomInt(50000, 150000);
+                gameState.budget -= cost;
+                addTransaction('Reparos no Centro Médico', cost, 'expense');
+                addMessage('Chefe do Dep. Médico', `Tivemos uma falha em um equipamento crucial no Centro Médico. Os reparos custaram ${formatCurrency(cost)}. Precisamos de mais investimentos.`);
             }
         }
     ];
@@ -2354,9 +2623,10 @@ function triggerRandomEvent() {
     }
 }
 
+
 function addTransaction(description, amount, type) {
     gameState.transactions.unshift({
-        date: new Date(),
+        date: new Date().toISOString(),
         description,
         amount,
         type
@@ -2367,17 +2637,31 @@ function addTransaction(description, amount, type) {
 }
 function renderFinances() {
     const { stadium, club } = gameState;
-    const nextLevel = stadium.level + 1;
-    const upgradeCost = 1000000 * Math.pow(nextLevel, 2);
-
+    
+    // Stadium
+    const nextStadiumLevel = stadium.level + 1;
+    const upgradeStadiumCost = 1000000 * Math.pow(nextStadiumLevel, 2);
     document.getElementById('stadium-level').innerText = stadium.level;
     document.getElementById('stadium-capacity').innerText = stadium.capacity.toLocaleString('pt-BR');
-    document.getElementById('upgrade-stadium-cost').innerText = formatCurrency(upgradeCost);
+    document.getElementById('upgrade-stadium-cost').innerText = formatCurrency(upgradeStadiumCost);
+    const upgradeStadiumButton = document.getElementById('upgrade-stadium-button');
+    upgradeStadiumButton.disabled = gameState.budget < upgradeStadiumCost;
+    upgradeStadiumButton.classList.toggle('opacity-50', gameState.budget < upgradeStadiumCost);
+    
+    // Other Structures
+    const structureTypes = ['academy', 'medical', 'marketing', 'scouting'];
+    structureTypes.forEach(type => {
+        const level = club[type + 'Level'];
+        const nextLevel = level + 1;
+        const upgradeCost = 500000 * Math.pow(nextLevel, 2.2);
+        
+        document.getElementById(`${type}-level`).innerText = level;
+        document.getElementById(`upgrade-${type}-cost`).innerText = formatCurrency(upgradeCost);
+        const button = document.getElementById(`upgrade-${type}-button`);
+        button.disabled = gameState.budget < upgradeCost;
+        button.classList.toggle('opacity-50', gameState.budget < upgradeCost);
+    });
 
-    const upgradeButton = document.getElementById('upgrade-stadium-button');
-    upgradeButton.disabled = gameState.budget < upgradeCost;
-    upgradeButton.classList.toggle('opacity-50', gameState.budget < upgradeCost);
-    upgradeButton.classList.toggle('cursor-not-allowed', gameState.budget < upgradeCost);
 
     const busStatusDiv = document.getElementById('bus-status');
     if (club.hasBus) {
@@ -2402,7 +2686,7 @@ function renderFinances() {
             const sign = t.type === 'income' ? '+' : '-';
             reportDiv.innerHTML += `
                 <div class="flex justify-between items-center border-b border-custom pb-1">
-                    <span>${t.description} <span class="text-xs text-muted">(${t.date.toLocaleDateString()})</span></span>
+                    <span>${t.description} <span class="text-xs text-muted">(${new Date(t.date).toLocaleDateString()})</span></span>
                     <span class="font-bold ${color}">${sign}${formatCurrency(t.amount)}</span>
                 </div>
             `;
@@ -2415,7 +2699,7 @@ function renderSeasonGoals() {
     const card = document.getElementById('season-goals-card');
     const table = gameState.competitions['CBFD League One'].table;
     const userTeamData = table.find(t => t.name === gameState.userTeam);
-    const currentPosition = table.findIndex(t => t.name === gameState.userTeam) + 1;
+    const currentPosition = userTeamData ? table.findIndex(t => t.name === gameState.userTeam) + 1 : 0;
     const currentWins = userTeamData ? userTeamData.v : 0;
     
     const posGoal = gameState.goals.leaguePosition;
@@ -2434,15 +2718,32 @@ function renderSeasonGoals() {
     `;
 }
 
-function upgradeStadium() {
-    const nextLevel = gameState.stadium.level + 1;
-    const upgradeCost = 1000000 * Math.pow(nextLevel, 2);
-    if (gameState.budget >= upgradeCost) {
-        gameState.budget -= upgradeCost;
-        gameState.stadium.level = nextLevel;
-        gameState.stadium.capacity += 5000 * Math.pow(nextLevel, 1.5);
-        addTransaction('Ampliação do estádio', upgradeCost, 'expense');
-        showMessage('Estádio Ampliado!', `Seu estádio foi melhorado para o nível ${gameState.stadium.level}, com capacidade para ${gameState.stadium.capacity.toLocaleString('pt-BR')} torcedores!`);
+function upgradeStructure(type) {
+    let level, cost, name;
+    if (type === 'stadium') {
+        level = gameState.stadium.level;
+        cost = 1000000 * Math.pow(level + 1, 2);
+        name = 'Estádio';
+    } else {
+        level = gameState.club[type + 'Level'];
+        cost = 500000 * Math.pow(level + 1, 2.2);
+        const names = { academy: 'Academia', medical: 'Centro Médico', marketing: 'Marketing', scouting: 'Scouting'};
+        name = names[type];
+    }
+
+    if (gameState.budget >= cost) {
+        gameState.budget -= cost;
+        addTransaction(`Investimento em ${name}`, cost, 'expense');
+
+        if (type === 'stadium') {
+            gameState.stadium.level++;
+            gameState.stadium.capacity += 5000 * Math.pow(gameState.stadium.level, 1.5);
+            showMessage('Estádio Ampliado!', `Seu estádio foi melhorado para o nível ${gameState.stadium.level}, com capacidade para ${gameState.stadium.capacity.toLocaleString('pt-BR')} torcedores!`);
+        } else {
+            gameState.club[type + 'Level']++;
+            showMessage('Investimento Realizado!', `Sua estrutura de ${name} foi melhorada para o nível ${gameState.club[type + 'Level']}!`);
+        }
+        
         renderFinances();
         updateCareerDashboard();
     }
@@ -2461,7 +2762,7 @@ function buyBus() {
 }
 
 function addMessage(from, text, isRead = false) {
-    gameState.messages.unshift({ from, text, date: new Date(), read: isRead });
+    gameState.messages.unshift({ from, text, date: new Date().toISOString(), read: isRead });
     if (gameState.messages.length > 30) {
         gameState.messages = gameState.messages.slice(0, 30);
     }
@@ -2479,7 +2780,7 @@ function renderMessages() {
             <div class="border-b border-custom pb-3 last:border-b-0 ${!msg.read ? 'bg-indigo-900/20' : ''} p-3 rounded-lg">
                 <p class="font-semibold text-purple-400">De: ${msg.from}</p>
                 <p class="text-sm mt-1">${msg.text}</p>
-                <p class="text-xs text-muted text-right mt-1">${msg.date.toLocaleString('pt-BR')}</p>
+                <p class="text-xs text-muted text-right mt-1">${new Date(msg.date).toLocaleString('pt-BR')}</p>
             </div>
         `;
         msg.read = true;
