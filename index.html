@@ -174,7 +174,22 @@
             border-radius: 50%;
         }
 
-        /* === INÍCIO: NOVOS ESTILOS PARA A LOJA === */
+        /* === INÍCIO: NOVOS ESTILOS PARA A LOJA E ADRYAN === */
+
+        /* Animação de brilho para o card exclusivo */
+        @keyframes orange-glow {
+            0%, 100% {
+                box-shadow: 0 0 10px 2px rgba(251, 146, 60, 0.7), 0 0 20px 5px rgba(249, 115, 22, 0.5);
+                border-color: #fb923c;
+            }
+            50% {
+                box-shadow: 0 0 20px 5px rgba(251, 146, 60, 1), 0 0 35px 10px rgba(249, 115, 22, 0.7);
+                border-color: #fcd34d;
+            }
+        }
+        .card-adryan-exclusive {
+            animation: orange-glow 2s ease-in-out infinite;
+        }
 
         /* Tela de Carregamento da Loja */
         #shop-loading-overlay {
@@ -277,6 +292,12 @@
         .card-raro { background: linear-gradient(45deg, #1d4ed8, #3b82f6); border-color: #60a5fa; }
         .card-epico { background: linear-gradient(45deg, #7e22ce, #a855f7); border-color: #c084fc; }
         .card-lendario { background: linear-gradient(45deg, #f59e0b, #fbbf24); border-color: #fcd34d; }
+        /* Classe para raridade exclusiva do Adryan */
+        .card-lendário-exclusivo {
+            background: linear-gradient(45deg, #ca8a04, #f59e0b, #fbbf24, #fde68a);
+            border-color: #fcd34d;
+        }
+
 
         /* Miniatura no botão do menu */
         .shop-thumbnail {
@@ -288,7 +309,26 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* === FIM: NOVOS ESTILOS PARA A LOJA === */
+        /* === FIM: NOVOS ESTILOS PARA A LOJA E ADRYAN === */
+
+        /* === INÍCIO: Correção do Modal CBDRAFT === */
+        #cbdraft-modal .modal-content {
+            max-width: 800px; /* Largura máxima de 800px */
+            width: 90%; /* Ocupa 90% da largura da tela, até o máximo de 800px */
+            max-height: 85vh; /* Altura máxima de 85% da altura da tela */
+            overflow-y: auto; /* Adiciona scroll se o conteúdo for maior que a altura máxima */
+            margin: auto; /* Centraliza o modal que já está dentro de um flex container */
+        }
+        #cbdraft-modal .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2.5rem; /* Aumentado para melhor visibilidade */
+            line-height: 1;
+            z-index: 10; /* Garante que o botão fique sobre o conteúdo */
+            cursor: pointer;
+        }
+        /* === FIM: Correção do Modal CBDRAFT === */
     </style>
 </head>
 <body class="dark-mode min-h-screen">
@@ -434,8 +474,8 @@
                 <h2 class="text-3xl font-bold">Finanças e Estrutura</h2>
                 <div></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-card rounded-xl p-6 border border-custom lg:col-span-1">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-card rounded-xl p-6 border border-custom">
                     <h3 class="text-xl font-semibold mb-4">Estrutura do Clube</h3>
                     <div class="space-y-4">
                         <div>
@@ -480,8 +520,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-card rounded-xl p-6 border border-custom lg:col-span-2">
-                    <h3 class="text-xl font-semibold mb-4">Relatório Financeiro</h3>
+                <!-- NOVO: Relatório Financeiro Mensal -->
+                <div class="bg-card rounded-xl p-6 border border-custom">
+                    <h3 class="text-xl font-semibold mb-4">Relatório Financeiro Mensal</h3>
+                    <div id="monthly-financial-report" class="space-y-3 text-sm">
+                        <p class="text-muted">Nenhum relatório gerado ainda.</p>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 mt-6">Histórico de Transações</h3>
                     <div id="financial-report" class="space-y-3 text-sm max-h-64 overflow-y-auto">
                         <p class="text-muted">Nenhuma transação registrada nesta temporada.</p>
                     </div>
@@ -530,6 +575,11 @@
                             <option value="equilibrado">Equilibrado</option>
                             <option value="ofensivo">Ofensivo</option>
                         </select>
+                    </div>
+                    <!-- NOVO: Química do Time -->
+                    <div id="team-chemistry-display" class="bg-gray-800 p-3 rounded-lg text-center">
+                        <h4 class="font-semibold text-lg">Química do Time</h4>
+                        <p class="text-3xl font-bold text-green-400">0%</p>
                     </div>
                 </div>
                 <div class="lg:col-span-2 bg-card rounded-xl p-4 border border-custom">
@@ -667,6 +717,11 @@
                     <label for="autosave-checkbox" class="text-lg font-medium">Salvar Automático</label>
                     <input type="checkbox" id="autosave-checkbox" onchange="toggleAutoSave(this.checked)" class="w-6 h-6 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
                 </div>
+                <!-- NOVO: Opção de Handicap -->
+                <div class="flex items-center justify-between pt-4 border-t border-custom">
+                    <label for="handicap-checkbox" class="text-lg font-medium">Handicap da IA</label>
+                    <input type="checkbox" id="handicap-checkbox" onchange="toggleHandicap(this.checked)" class="w-6 h-6 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                </div>
                 <button onclick="resetProgress()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg mt-4">Resetar Progresso</button>
             </div>
             <button onclick="closeModal('settings-modal')" class="absolute top-4 right-4 text-2xl text-muted hover:text-white">&times;</button>
@@ -727,7 +782,9 @@
         <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom max-w-sm">
             <h3 id="message-modal-title" class="text-2xl font-bold mb-4">Aviso</h3>
             <p id="message-modal-text" class="text-lg mb-6"></p>
-            <button onclick="closeModal('message-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">OK</button>
+            <div id="message-modal-buttons">
+                <button onclick="closeModal('message-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">OK</button>
+            </div>
         </div>
     </div>
     
@@ -739,13 +796,22 @@
         </div>
     </div>
 
-    <!-- INÍCIO: Modal do CBDRAFT -->
+    <!-- INÍCIO: Modal do CBDRAFT (CORRIGIDO) -->
     <div id="cbdraft-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-lg relative">
-             <button onclick="closeModal('cbdraft-modal')" class="absolute top-4 right-4 text-2xl text-muted hover:text-white">&times;</button>
+        <div class="modal-content bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom relative">
+            <button onclick="closeModal('cbdraft-modal')" class="modal-close-button text-muted hover:text-white">&times;</button>
             <h3 class="text-3xl font-bold mb-4">CBDRAFT</h3>
             <p class="text-muted mb-6">Escolha um pacote para abrir e testar sua sorte!</p>
             
+            <!-- INÍCIO: Seção do Pacote Exclusivo Adryan -->
+            <div id="adryan-pack-section" class="mb-6 border-2 border-yellow-500 rounded-lg p-4 bg-yellow-500/10">
+                <h4 class="text-xl font-bold text-yellow-400 mb-2">Pacote Exclusivo Adryan</h4>
+                <button id="adryan-pack-button" onclick="openAdryanPack()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-black py-4 px-4 rounded-lg text-lg shadow-lg transition-transform transform hover:scale-105">
+                    <i class="fas fa-star mr-2"></i> Abrir Pacote de Homenagem
+                </button>
+            </div>
+            <!-- FIM: Seção do Pacote Exclusivo Adryan -->
+
             <div id="pack-selection" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <button onclick="openPack('Comum')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-4 rounded-lg">Pacote Comum</button>
                 <button onclick="openPack('Raro')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-lg">Pacote Raro</button>
@@ -775,7 +841,7 @@
 
 <script>
 // ===================================================================================
-// JOGO CBFD 25 - LÓGICA PRINCIPAL (v8.4 - Update CBDRAFT)
+// JOGO CBFD 25 - LÓGICA PRINCIPAL (v9.1 - Update Adryan)
 // ===================================================================================
 
 // -----------------------------------------------------------------------------------
@@ -786,14 +852,15 @@ let simulationState = {
     interval: null, minute: 0, paused: false, matchData: null,
     homeTeam: null, awayTeam: null, homeGoals: 0, awayGoals: 0,
     events: [], eventIndex: 0,
-    interactiveEventTriggered: false // Flag para eventos interativos
+    interactiveEventTriggered: false, // Flag para eventos interativos
+    userWinningStreak: 0 // NOVO: Handicap
 };
 let substitutionState = {
     selectedStarter: null, selectedBench: null,
     isTacticsScreen: false // Flag para diferenciar da substituição em jogo
 };
 
-// --- INÍCIO: LÓGICA DA LOJA E CBDRAFT ---
+// --- INÍCIO: LÓGICA DA LOJA E CBDRAFT (MODIFICADO) ---
 
 /**
  * Exibe a tela de carregamento por 10 segundos e depois abre a loja.
@@ -820,8 +887,93 @@ function openCBDraft() {
     document.getElementById('pack-selection').classList.remove('hidden');
     document.getElementById('pack-animation-container').classList.add('hidden');
     document.getElementById('player-card-display').classList.add('hidden');
+    
+    // Verifica o estado do pacote Adryan e atualiza o botão
+    const adryanButton = document.getElementById('adryan-pack-button');
+    if (gameState.adryanOpened) {
+        adryanButton.disabled = true;
+        adryanButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Pacote já aberto';
+        adryanButton.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+        adryanButton.disabled = false;
+        adryanButton.innerHTML = '<i class="fas fa-star mr-2"></i> Abrir Pacote de Homenagem';
+        adryanButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
     openModal('cbdraft-modal');
 }
+
+/**
+ * Lógica para abrir o pacote exclusivo do Adryan.
+ */
+function openAdryanPack() {
+    if (gameState.adryanOpened) {
+        return; // Segurança extra para não abrir de novo
+    }
+
+    // 1. Marcar como aberto e desativar o botão
+    gameState.adryanOpened = true;
+    const adryanButton = document.getElementById('adryan-pack-button');
+    adryanButton.disabled = true;
+    adryanButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Pacote já aberto';
+    adryanButton.classList.add('opacity-50', 'cursor-not-allowed');
+    saveGame(true); // Salva silenciosamente para persistir a flag
+
+    // 2. Criar o jogador Adryan
+    const adryanPlayer = {
+        id: gameState.nextPlayerId++,
+        name: "Adryan",
+        age: 20, // Idade simbólica
+        position: "MEI ou ATA",
+        overall: 99,
+        potential: 99,
+        marketValue: 0,
+        salary: 0,
+        nationality: "Brasileiro",
+        teamName: "Inventário",
+        morale: 100,
+        fitness: 100,
+        suspended: 0,
+        injuryProne: false,
+        stats: { attack: 99, defense: 99 },
+        seasonGoals: 0, seasonAssists: 0, seasonMatches: 0,
+        playedLastMatch: false,
+        promisedMinutes: false,
+        rarity: "Lendário Exclusivo" // Raridade especial
+    };
+
+    // 3. Adicionar ao inventário
+    gameState.inventory.push(adryanPlayer);
+
+    // 4. Mostrar a homenagem
+    showAdryanTribute();
+
+    // 5. Exibir o card do jogador
+    // Esconde a seleção de pacotes para focar no card do Adryan
+    document.getElementById('pack-selection').classList.add('hidden');
+    displayDraftedPlayer(adryanPlayer, true); // O 'true' indica que é o card exclusivo
+    document.getElementById('player-card-display').classList.remove('hidden');
+}
+
+/**
+ * Exibe a mensagem de homenagem ao Adryan.
+ */
+function showAdryanTribute() {
+    const tributeText = `
+        <div class="text-center">
+            <h3 class="text-2xl font-bold mb-4 text-yellow-400">💛 Homenagem ao Adryan 💛</h3>
+            <p class="text-lg mb-2">A comunidade do CBFD 25 envia força e boas energias para o nosso jogador Adryan, que se afastou temporariamente para cuidar da sua saúde.</p>
+            <p class="text-lg font-semibold mb-4">Seu lugar aqui está guardado, irmão! 🤍</p>
+            <p class="text-xl font-bold">Estamos contigo!</p>
+        </div>
+    `;
+    const messageModal = document.getElementById('message-modal');
+    document.getElementById('message-modal-title').remove(); // Remove o título padrão
+    document.getElementById('message-modal-text').innerHTML = tributeText;
+    document.getElementById('message-modal-buttons').innerHTML = `<button onclick="closeModal('message-modal')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-8 rounded-lg">Força, Adryan!</button>`;
+    openModal('message-modal');
+}
+
 
 /**
  * Determina a raridade de um jogador com base nas probabilidades.
@@ -877,6 +1029,7 @@ function openPack(packType) {
 
     // Esconde a seleção de pacotes e mostra a animação
     packSelectionDiv.classList.add('hidden');
+    document.getElementById('adryan-pack-section').classList.add('hidden'); // Esconde o pacote Adryan também
     playerCardDiv.classList.add('hidden');
     animationDiv.classList.remove('hidden');
     animationDiv.classList.add('pack-opening-animation');
@@ -898,25 +1051,33 @@ function openPack(packType) {
 
         // Mostra a seleção de pacotes novamente para abrir outro
         packSelectionDiv.classList.remove('hidden');
+        document.getElementById('adryan-pack-section').classList.remove('hidden');
     }, 3000);
 }
 
 /**
  * Renderiza o card do jogador draftado.
  * @param {object} player - O objeto do jogador.
+ * @param {boolean} isExclusive - Flag para o card do Adryan.
  */
-function displayDraftedPlayer(player) {
+function displayDraftedPlayer(player, isExclusive = false) {
     const displayDiv = document.getElementById('player-card-display');
-    const rarityClass = `card-${player.rarity.toLowerCase()}`;
+    // Sanitize rarity for class name
+    const rarityClassName = player.rarity.toLowerCase().replace(/\s+/g, '-');
+    const rarityClass = `card-${rarityClassName}`;
+    
     const rarityColor = {
         'Comum': 'text-gray-300',
         'Raro': 'text-blue-300',
         'Épico': 'text-purple-300',
-        'Lendário': 'text-yellow-300'
+        'Lendário': 'text-yellow-300',
+        'Lendário Exclusivo': 'text-orange-300 font-black'
     }[player.rarity];
 
+    const exclusiveClass = isExclusive ? 'card-adryan-exclusive' : '';
+
     displayDiv.innerHTML = `
-        <div class="draft-card ${rarityClass} slide-in-up">
+        <div class="draft-card ${rarityClass} ${exclusiveClass} slide-in-up">
             <p class="font-bold text-xl ${rarityColor} uppercase tracking-wider">${player.rarity}</p>
             <h4 class="text-3xl font-black my-2">${player.name}</h4>
             <div class="flex justify-around items-center my-4 text-center">
@@ -934,7 +1095,7 @@ function displayDraftedPlayer(player) {
                 </div>
             </div>
             <p class="text-sm">Idade: ${player.age}</p>
-            <p class="text-sm">Valor: ${formatCurrency(player.marketValue)}</p>
+            <p class="text-sm">Valor: ${player.marketValue > 0 ? formatCurrency(player.marketValue) : 'Inestimável'}</p>
             <p class="mt-4 text-xs text-muted">O jogador foi adicionado ao seu inventário.</p>
         </div>
     `;
@@ -953,10 +1114,18 @@ function renderInventory() {
     }
 
     gameState.inventory.forEach(player => {
-        const rarityClass = `card-${player.rarity.toLowerCase()}`;
+        const isAdryan = player.rarity === 'Lendário Exclusivo';
+        const rarityClassName = player.rarity.toLowerCase().replace(/\s+/g, '-');
+        const rarityClass = `card-${rarityClassName}`;
+        const exclusiveClass = isAdryan ? 'card-adryan-exclusive' : '';
+        
+        const sellButton = isAdryan 
+            ? `<button class="bg-gray-600 text-white font-bold py-2 px-3 rounded-lg text-sm opacity-50 cursor-not-allowed" title="Este jogador não pode ser vendido.">Inestimável</button>`
+            : `<button onclick="sellFromInventory(${player.id})" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded-lg text-sm">Vender (${formatCurrency(player.marketValue)})</button>`;
+
         const cardHTML = `
-            <div class="draft-card ${rarityClass}">
-                <p class="font-bold text-lg ${player.rarity.toLowerCase()} uppercase">${player.rarity}</p>
+            <div class="draft-card ${rarityClass} ${exclusiveClass}">
+                <p class="font-bold text-lg ${rarityClassName} uppercase">${player.rarity}</p>
                 <h4 class="text-2xl font-bold my-1">${player.name}</h4>
                 <p class="text-sm text-muted mb-2">${player.position} | Idade: ${player.age}</p>
                 <div class="flex justify-around items-center my-3 text-center">
@@ -964,7 +1133,7 @@ function renderInventory() {
                     <div><p class="text-3xl font-bold text-blue-400">${player.potential}</p><p class="text-xs text-muted">POT</p></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-4">
-                    <button onclick="sellFromInventory(${player.id})" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded-lg text-sm">Vender (${formatCurrency(player.marketValue)})</button>
+                    ${sellButton}
                     <button onclick="moveToSquad(${player.id})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-sm">Mandar para Elenco</button>
                 </div>
             </div>
@@ -982,6 +1151,8 @@ function sellFromInventory(playerId) {
     if (playerIndex === -1) return;
 
     const player = gameState.inventory[playerIndex];
+    if (player.rarity === 'Lendário Exclusivo') return; // Segurança extra
+
     gameState.budget += player.marketValue;
     addTransaction(`Venda de jogador (CBDRAFT): ${player.name}`, player.marketValue, 'income');
     
@@ -1024,6 +1195,9 @@ function moveToSquad(playerId) {
 // -----------------------------------------------------------------------------------
 const firstNames = ["Carlos", "Bruno", "Gabriel", "Lucas", "Matheus", "Rafael", "Thiago", "Diego", "Felipe", "Gustavo", "João", "Pedro", "Marcos", "Daniel", "Eduardo"];
 const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Lima", "Pereira", "Ferreira", "Costa", "Gomes", "Martins", "Alves", "Ribeiro", "Carvalho", "Rodrigues", "Melo"];
+// NOVO: Nacionalidades para sistema de química
+const nationalities = ["Brasileiro", "Argentino", "Uruguaio", "Colombiano", "Chileno", "Português", "Espanhol", "Francês", "Alemão", "Inglês"];
+
 
 // Position Normalization Map
 const positionMap = {
@@ -1031,9 +1205,10 @@ const positionMap = {
     'LD': 'DEF', 'LE': 'DEF', 'ZAG': 'DEF', 'DC': 'DEF',
     'VOL': 'MC', 'MC': 'MC', 'MCD': 'MC',
     'MAT': 'MEI', 'MEI': 'MEI', 'ME': 'MEI', 'MD': 'MEI',
-    'PE': 'ATA', 'PD': 'ATA', 'CA': 'ATA', 'PL': 'ATA', 'EE': 'ATA', 'ED': 'ATA'
+    'PE': 'ATA', 'PD': 'ATA', 'CA': 'ATA', 'PL': 'ATA', 'EE': 'ATA', 'ED': 'ATA',
+    'MEI OU ATA': 'MEI' // Normaliza a posição do Adryan para cálculo
 };
-const allPositions = Object.keys(positionMap);
+const allPositions = Object.keys(positionMap).filter(p => p !== 'MEI OU ATA');
 
 // Formation Validation Rules
 const formationRules = {
@@ -1135,6 +1310,8 @@ function generatePlayer(id, pos, teamName = "Agente Livre", isNewGen = false) {
     const potentialFactor = 1 + ((potential - 80) / 20); // Higher potential = higher value
     const baseValue = Math.pow(overall / 10, 2.5) * 10000;
     const marketValue = Math.round(baseValue * ageFactor * potentialFactor);
+    // NOVO: Salário baseado no valor e overall
+    const salary = Math.round(marketValue / 100 + overall * 100);
 
     return { 
         id, 
@@ -1144,8 +1321,10 @@ function generatePlayer(id, pos, teamName = "Agente Livre", isNewGen = false) {
         overall, 
         potential,
         marketValue,
+        salary, // NOVO: Salário
+        nationality: getRandom(nationalities), // NOVO: Nacionalidade
         teamName,
-        morale: 75,
+        morale: 75, // NOVO: Moral inicial
         fitness: 100,
         suspended: 0,
         injuryProne: Math.random() < 0.1,
@@ -1153,7 +1332,9 @@ function generatePlayer(id, pos, teamName = "Agente Livre", isNewGen = false) {
             attack: getRandomInt(overall-10, overall+10), 
             defense: getRandomInt(overall-10, overall+10) 
         },
-        seasonGoals: 0, seasonAssists: 0, seasonMatches: 0
+        seasonGoals: 0, seasonAssists: 0, seasonMatches: 0,
+        playedLastMatch: false, // NOVO: Controle de moral
+        promisedMinutes: false, // NOVO: Controle de promessas
     };
 }
 
@@ -1185,19 +1366,22 @@ function generateTeam(teamData) {
         logoText: teamData.logo, 
         players, 
         isUserTeam: false,
-        fanBase: getRandomInt(20000, 100000)
+        fanBase: getRandomInt(20000, 100000),
+        reputation: getRandomInt(1, 10), // NOVO: Reputação do time
+        trophies: 0, // NOVO: Títulos
     };
 }
 
 function initGame(isNewGame = true) {
     if (isNewGame) {
         gameState = {
-            version: "8.4", // Updated version
+            version: "9.1", // Updated version
             season: 2025, userTeam: null, nextPlayerId: 1,
             difficulty: 'normal',
             budget: 5000000,
-            inventory: [], // INÍCIO: Inventário CBDRAFT
-            transferBanSeasons: 0, // NEW: Transfer ban state
+            inventory: [], 
+            adryanOpened: false, // Flag para o pacote exclusivo
+            transferBanSeasons: 0,
             stadium: { level: 1, capacity: 10000 },
             club: { 
                 hasBus: false,
@@ -1210,13 +1394,15 @@ function initGame(isNewGame = true) {
             news: [],
             messages: [],
             transactions: [],
+            monthlyReports: [], // NOVO: Relatórios mensais
             lastSalaryPaidDate: null,
             sponsorship: {
                 main: { name: "LUCCABET", value: 500000 },
                 secondary: null
             },
             settings: {
-                autoSave: false
+                autoSave: false,
+                handicap: false, // NOVO: Handicap
             },
             competitions: {
                 'CBFD League One': { schedule: [], table: [], topScorers: [], currentRound: 0, winner: null },
@@ -1230,7 +1416,8 @@ function initGame(isNewGame = true) {
             calendar: [],
             goals: { // Season Goals
                 leaguePosition: 10,
-                wins: 15
+                wins: 15,
+                secret: null, // NOVO: Objetivos secretos
             },
             consecutiveFailures: 0, // For dismissal
             champions: { // Track champions for Super Cup and Recopa
@@ -1258,6 +1445,7 @@ function initGame(isNewGame = true) {
     renderCompetitionsScreen();
     document.getElementById('load-game-button').style.display = localStorage.getItem('cbfd25_save_v8') ? 'inline-block' : 'none';
     document.getElementById('autosave-checkbox').checked = gameState.settings.autoSave;
+    document.getElementById('handicap-checkbox').checked = gameState.settings.handicap; // NOVO: Handicap
     showScreen('main-menu');
 }
 
@@ -1499,6 +1687,8 @@ function updateKnockoutBracket(compKey, winner, loser, roundName) {
             }
         } else {
             comp.winner = winner; // This is the final match
+            const winningTeam = findTeam(winner);
+            if (winningTeam) winningTeam.trophies++;
         }
     }
 }
@@ -1588,7 +1778,7 @@ function updateCareerDashboard() {
 }
 
 // -----------------------------------------------------------------------------------
-// SIMULAÇÃO DE PARTIDA (LÓGICA CORRIGIDA)
+// SIMULAÇÃO DE PARTIDA (LÓGICA CORRIGIDA E AMPLIADA)
 // -----------------------------------------------------------------------------------
 function getTeamStrength(team, players) {
     const currentPlayers = players || team.players.slice(0, 11);
@@ -1599,8 +1789,9 @@ function getTeamStrength(team, players) {
     
     currentPlayers.forEach(p => {
         if (p.suspended > 0) return;
-        const moraleFactor = p.morale / 100;
-        const fitnessFactor = (p.fitness / 100) * 0.7 + 0.3; // Fitness has less impact than morale
+        // NOVO: Fator de moral e físico
+        const moraleFactor = 0.5 + (p.morale / 200); // Moral de 0-100 se torna um fator de 0.5 a 1.0
+        const fitnessFactor = 0.7 + (p.fitness / 333); // Fitness de 0-100 se torna um fator de 0.7 a 1.0
         const effectiveOverall = p.overall * moraleFactor * fitnessFactor;
         const normalizedPos = normalizePosition(p.position);
 
@@ -1628,8 +1819,12 @@ function getTeamStrength(team, players) {
         defenseModifier = 1.15;
     }
 
-    const avgAttack = (baseAttack / currentPlayers.length) * attackModifier;
-    const avgDefense = (baseDefense / currentPlayers.length) * defenseModifier;
+    // NOVO: Fator de química
+    const chemistry = calculateTeamChemistry(team, currentPlayers);
+    const chemistryFactor = 1 + (chemistry / 200); // Química de 100% dá um bônus de 50%
+
+    const avgAttack = (baseAttack / currentPlayers.length) * attackModifier * chemistryFactor;
+    const avgDefense = (baseDefense / currentPlayers.length) * defenseModifier * chemistryFactor;
     
     // Normalize to a 0-100 scale for easier calculation
     return { 
@@ -1665,6 +1860,14 @@ function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
             awayStrength.attack *= difficultyModifier;
         }
     }
+    
+    // NOVO: Lógica de Handicap
+    if (gameState.settings.handicap && simulationState.userWinningStreak >= 3) {
+        const handicapBoost = 1 + (simulationState.userWinningStreak * 0.05); // 5% boost por vitória seguida
+        if (homeTeam.name !== gameState.userTeam) homeStrength.attack *= handicapBoost;
+        if (awayTeam.name !== gameState.userTeam) awayStrength.attack *= handicapBoost;
+    }
+
 
     // Fator de pontuação: compara o ataque de um time com a defesa do outro
     // Um valor de 1.0 significa um confronto equilibrado. >1.0 é vantagem, <1.0 é desvantagem.
@@ -1694,14 +1897,12 @@ function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
             if (Math.random() < goalChanceBase * homeScoreFactor) {
                 homeGoals++;
                 const scorer = getRandom(homeStarters.filter(p => normalizePosition(p.position) !== 'GOL'));
-                // BUG FIX: A propriedade 'score' foi removida do evento de gol para evitar que o placar seja resetado.
-                events.push({ minute, type: 'goal', team: homeTeam.name, player: scorer.name, playerId: scorer.id });
+                events.push({ minute, type: 'goal', team: homeTeam.name, player: scorer.name, playerId: scorer.id, score: `${homeGoals} - ${awayGoals}` });
             }
             if (Math.random() < goalChanceBase * awayScoreFactor) {
                 awayGoals++;
                 const scorer = getRandom(awayStarters.filter(p => normalizePosition(p.position) !== 'GOL'));
-                // BUG FIX: A propriedade 'score' foi removida do evento de gol para evitar que o placar seja resetado.
-                events.push({ minute, type: 'goal', team: awayTeam.name, player: scorer.name, playerId: scorer.id });
+                events.push({ minute, type: 'goal', team: awayTeam.name, player: scorer.name, playerId: scorer.id, score: `${homeGoals} - ${awayGoals}` });
             }
 
             // Chances de Cartões e Lesões (mantido como estava)
@@ -1748,6 +1949,7 @@ function startNarratedSimulation(matchData) {
 
     const matchResult = simulateMatch(homeTeam, awayTeam, false);
     simulationState = {
+        ...simulationState, // Mantém o userWinningStreak
         interval: null, minute: 0, paused: false, matchData,
         homeTeam, awayTeam,
         homeGoals: 0, awayGoals: 0,
@@ -1821,14 +2023,13 @@ function resumeSimulation() {
                 p.classList.add('goal-event');
                 icon = '<i class="fas fa-futbol text-green-400"></i>';
                 text = `<strong>GOL!</strong> de ${event.player} para ${event.team}!`;
-                // BUG FIX: O placar agora é incrementado em vez de ser sobrescrito.
-                // Isso garante que o placar seja mantido corretamente durante todo o jogo.
-                if (event.team === simulationState.homeTeam.name) {
-                    simulationState.homeGoals++;
-                } else {
-                    simulationState.awayGoals++;
+                // Update score display only if it's a goal event
+                if (event.score) {
+                    const [h, a] = event.score.split(' - ');
+                    simulationState.homeGoals = parseInt(h);
+                    simulationState.awayGoals = parseInt(a);
+                    document.getElementById('sim-score').innerText = event.score;
                 }
-                document.getElementById('sim-score').innerText = `${simulationState.homeGoals} - ${simulationState.awayGoals}`;
             } else if (event.type === 'card-yellow') {
                 p.classList.add('card-yellow-event');
                 icon = '<i class="fas fa-square text-yellow-400"></i>';
@@ -2157,7 +2358,7 @@ function processMatchEvents(homeTeam, awayTeam, events, compKey) {
                         comp.topScorers.push({ id: player.id, name: player.name, teamName: player.teamName, goals: 1 });
                     }
                 }
-                player.morale = Math.min(100, player.morale + 5);
+                // player.morale = Math.min(100, player.morale + 5); // Removido para controle centralizado
                 break;
             case 'card-red':
                 player.suspended = 1; // Suspend for 1 match
@@ -2174,22 +2375,38 @@ function processMatchEvents(homeTeam, awayTeam, events, compKey) {
     // Update fitness and matches played for starters
     const homeStarters = homeTeam.players.slice(0, 11);
     const awayStarters = awayTeam.players.slice(0, 11);
+    
+    // NOVO: Lógica de moral
+    [...homeTeam.players, ...awayTeam.players].forEach(p => p.playedLastMatch = false);
 
     [...homeStarters, ...awayStarters].forEach(p => {
         const player = allPlayersMap.get(p.id); // Get the actual player object from the team roster
         if(player && player.suspended === 0) { // Only update if not suspended
             player.fitness = Math.max(0, player.fitness - getRandomInt(8, 18));
             player.seasonMatches = (player.seasonMatches || 0) + 1;
+            player.playedLastMatch = true;
         }
     });
 }
 
 function processRoundEnd(round) {
+    let userTeamResult = 'none'; // 'win', 'draw', 'loss'
+
     const userMatch = round.matches.find(m => m.home === gameState.userTeam || m.away === gameState.userTeam);
     if(userMatch && userMatch.result) {
         let income = 0;
         const isHome = userMatch.home === gameState.userTeam;
         
+        // NOVO: Custo de viagem para jogos fora
+        const travelCost = isHome ? 0 : 50000;
+        // NOVO: Custo de manutenção do estádio para jogos em casa
+        const maintenanceCost = isHome ? 75000 : 0;
+        const totalMatchCosts = travelCost + maintenanceCost;
+        
+        // NOVO: Fator de dificuldade econômica
+        const difficultyCostFactor = gameState.difficulty === 'easy' ? 0.7 : gameState.difficulty === 'goat' ? 1.3 : 1.0;
+        const adjustedCosts = Math.round(totalMatchCosts * difficultyCostFactor);
+
         if (isHome) {
             const ticketPrice = 15;
             const attendance = Math.floor(gameState.stadium.capacity * (getRandomInt(75, 100) / 100));
@@ -2202,18 +2419,52 @@ function processRoundEnd(round) {
         if ((isHome && result[0] > result[1]) || (!isHome && result[1] > result[0])) {
             income += 100000;
             addTransaction('Prêmio por vitória na liga', 100000, 'income');
+            userTeamResult = 'win';
+            simulationState.userWinningStreak++;
         } else if (result[0] === result[1]) {
             income += 25000;
             addTransaction('Prêmio por empate na liga', 25000, 'income');
+            userTeamResult = 'draw';
+            simulationState.userWinningStreak = 0;
+        } else {
+            userTeamResult = 'loss';
+            simulationState.userWinningStreak = 0;
         }
-        gameState.budget += income;
+        
+        gameState.budget += (income - adjustedCosts);
+        if (adjustedCosts > 0) {
+            addTransaction('Custos da partida', adjustedCosts, 'expense');
+        }
     }
 
+    // NOVO: Atualização de moral pós-jogo
     gameState.teams.forEach(team => {
         team.players.forEach(p => {
+            // Recuperação de físico e suspensão
             p.fitness = Math.min(100, p.fitness + getRandomInt(10, 20));
-            p.morale = Math.min(100, Math.max(0, p.morale + getRandomInt(-2, 2)));
             if (p.suspended > 0) p.suspended--;
+
+            // Lógica de moral
+            if (p.teamName === gameState.userTeam) {
+                let moraleChange = 0;
+                if (p.playedLastMatch) {
+                    if (userTeamResult === 'win') moraleChange += 5;
+                    if (userTeamResult === 'loss') moraleChange -= 5;
+                    if (p.promisedMinutes) {
+                        moraleChange += 15; // Promessa cumprida
+                        p.promisedMinutes = false;
+                    }
+                } else {
+                    moraleChange -= 3; // Não jogou
+                    if (p.promisedMinutes) {
+                        moraleChange -= 20; // Promessa quebrada
+                        p.promisedMinutes = false;
+                    }
+                }
+                p.morale = Math.min(100, Math.max(0, p.morale + moraleChange));
+            } else {
+                 p.morale = Math.min(100, Math.max(0, p.morale + getRandomInt(-2, 2)));
+            }
         });
     });
 
@@ -2221,6 +2472,9 @@ function processRoundEnd(round) {
     generateCbfdNews(round);
     triggerRandomEvent();
     processMonthlySalaries(round.date);
+    // NOVO: Dispara eventos de mensagem de jogador e ofertas da IA
+    triggerPlayerMessage();
+    generateAIOffers();
 
     if (gameState.settings.autoSave) {
         saveGame(true);
@@ -2241,13 +2495,18 @@ function processMonthlySalaries(currentDate) {
 
     if (shouldPay) {
         const userTeam = findTeam(gameState.userTeam);
-        const salaryPerPlayer = 10000;
-        const totalPayroll = userTeam.players.length * salaryPerPlayer;
+        const totalPayroll = userTeam.players.reduce((sum, p) => sum + p.salary, 0);
         const monthName = currentRoundDate.toLocaleString('pt-BR', { month: 'long' });
+        
+        // NOVO: Fator de dificuldade econômica
+        const difficultyCostFactor = gameState.difficulty === 'easy' ? 0.8 : gameState.difficulty === 'goat' ? 1.2 : 1.0;
+        const adjustedPayroll = Math.round(totalPayroll * difficultyCostFactor);
 
-        gameState.budget -= totalPayroll;
-        addTransaction(`Salários (${monthName})`, totalPayroll, 'expense');
-        showToast(`Folha salarial de ${monthName} paga: ${formatCurrency(totalPayroll)}`);
+        gameState.budget -= adjustedPayroll;
+        addTransaction(`Salários (${monthName})`, adjustedPayroll, 'expense');
+        showToast(`Folha salarial de ${monthName} paga: ${formatCurrency(adjustedPayroll)}`);
+        
+        generateMonthlyReport(currentRoundDate); // NOVO: Gera o relatório mensal
 
         // Update the last paid date to the current round's date
         gameState.lastSalaryPaidDate = currentRoundDate.toISOString();
@@ -2297,6 +2556,26 @@ function openEndOfSeasonFlow() {
         <p>Artilheiro: <strong>${topScorer ? topScorer.name : 'N/A'}</strong> (${topScorer ? topScorer.teamName : ''}) - ${topScorer ? topScorer.seasonGoals : 0} gols</p>
         <p>Melhor Técnico: <strong>Técnico do ${bestManager || 'N/A'}</strong></p>
     `;
+    
+    // NOVO: Checagem de objetivos secretos
+    if (gameState.goals.secret) {
+        const { type, target, reward, competition } = gameState.goals.secret;
+        let objectiveMet = false;
+        if (type === 'league_pos' && (comp.table.findIndex(t => t.name === gameState.userTeam) + 1) <= target) {
+            objectiveMet = true;
+        } else if (type === 'cup_run' && gameState.competitions[competition].winner === gameState.userTeam) {
+            objectiveMet = true; // Simplificado para vencer a copa
+        }
+        
+        if (objectiveMet) {
+            summary += `<p class="text-green-400 mt-2"><strong>Objetivo Secreto Cumprido!</strong> Bônus de ${formatCurrency(reward)} recebido!</p>`;
+            gameState.budget += reward;
+            addTransaction('Bônus - Objetivo Secreto da Diretoria', reward, 'income');
+        } else {
+            summary += `<p class="text-red-400 mt-2"><strong>Objetivo Secreto Falhou.</strong> A diretoria está desapontada.</p>`;
+        }
+    }
+    
     document.getElementById('end-of-season-summary').innerHTML = summary;
     openModal('end-of-season-modal');
 }
@@ -2310,9 +2589,16 @@ function startNewSeason() {
     gameState.consecutiveFailures = 0;
     if (gameState.transferBanSeasons > 0) gameState.transferBanSeasons--; // Decrement transfer ban
     
-    // Marketing Investment bonus
+    // NOVO: Patrocínio dinâmico
+    const userTeamData = gameState.competitions['CBFD League One'].table.find(t => t.name === gameState.userTeam);
+    const userPosition = userTeamData ? gameState.competitions['CBFD League One'].table.indexOf(userTeamData) + 1 : 10;
+    let performanceModifier = 1.0;
+    if (userPosition === 1) performanceModifier = 1.5; // Campeão
+    else if (userPosition <= 4) performanceModifier = 1.2; // Top 4
+    else if (userPosition > 15) performanceModifier = 0.8; // Parte de baixo
+    
     const marketingBonus = 1 + (gameState.club.marketingLevel * 0.05);
-    gameState.sponsorship.main.value = Math.round(500000 * marketingBonus);
+    gameState.sponsorship.main.value = Math.round(500000 * marketingBonus * performanceModifier);
 
 
     Object.values(gameState.competitions).forEach(c => {
@@ -2355,6 +2641,9 @@ function startNewSeason() {
     if (libChamp && sulChamp) {
         generateKnockoutSchedule('Recopa CBFD', [libChamp, sulChamp], 2);
     }
+    
+    // NOVO: Gerar novo objetivo secreto
+    generateSecretObjective();
 
     updateAllTables();
     updateCareerDashboard();
@@ -2457,9 +2746,29 @@ function findTeam(teamName) {
 }
 function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
 function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
-function showMessage(title, text) {
-    document.getElementById('message-modal-title').innerText = title;
-    document.getElementById('message-modal-text').innerText = text;
+function showMessage(title, text, buttons = null) {
+    const titleEl = document.getElementById('message-modal-title');
+    if (titleEl) { // Check if title element exists before manipulating
+        titleEl.style.display = 'block';
+        titleEl.innerText = title;
+    }
+    document.getElementById('message-modal-text').innerHTML = text; // Use innerHTML to allow formatted text
+    const buttonsDiv = document.getElementById('message-modal-buttons');
+    buttonsDiv.innerHTML = '';
+    if (buttons) {
+        buttons.forEach(btn => {
+            const buttonEl = document.createElement('button');
+            buttonEl.className = btn.class || 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg';
+            buttonEl.innerText = btn.text;
+            buttonEl.onclick = () => {
+                if (btn.callback) btn.callback();
+                closeModal('message-modal');
+            };
+            buttonsDiv.appendChild(buttonEl);
+        });
+    } else {
+        buttonsDiv.innerHTML = `<button onclick="closeModal('message-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">OK</button>`;
+    }
     openModal('message-modal');
 }
 function showToast(message) {
@@ -2486,13 +2795,21 @@ function loadGame() {
     if (savedGame) {
         gameState = JSON.parse(savedGame);
         // Add any new properties from updates here for backward compatibility
-        gameState.version = gameState.version || "8.4";
-        gameState.inventory = gameState.inventory || []; // Adicionado para compatibilidade
+        gameState.version = gameState.version || "9.1";
+        gameState.inventory = gameState.inventory || [];
+        gameState.adryanOpened = gameState.adryanOpened || false; // Compatibility for old saves
         gameState.transferBanSeasons = gameState.transferBanSeasons || 0;
-        gameState.goals = gameState.goals || { leaguePosition: 10, wins: 15 };
+        gameState.goals = gameState.goals || { leaguePosition: 10, wins: 15, secret: null };
         gameState.consecutiveFailures = gameState.consecutiveFailures || 0;
         gameState.southAmericanTeams = gameState.southAmericanTeams || []; 
         gameState.lastSalaryPaidDate = gameState.lastSalaryPaidDate || null;
+        gameState.monthlyReports = gameState.monthlyReports || [];
+        if (!gameState.settings) {
+            gameState.settings = { autoSave: false, handicap: false };
+        } else {
+            gameState.settings.handicap = gameState.settings.handicap || false;
+        }
+
         if (!gameState.club) {
              gameState.club = { hasBus: false, academyLevel: 1, medicalLevel: 1, marketingLevel: 1, scoutingLevel: 1 };
         } else {
@@ -2524,15 +2841,21 @@ function loadGame() {
 
 function resetProgress() {
     closeModal('settings-modal');
-    showMessage('Confirmação', 'Tem certeza que deseja apagar todo o seu progresso? Esta ação não pode ser desfeita.');
-    document.querySelector('#message-modal button').onclick = () => {
-        localStorage.removeItem('cbfd25_save_v8');
-        location.reload();
-    };
+    showMessage('Confirmação', 'Tem certeza que deseja apagar todo o seu progresso? Esta ação não pode ser desfeita.', [
+        { text: 'Cancelar', class: 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg' },
+        { text: 'Apagar', class: 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg', callback: () => {
+            localStorage.removeItem('cbfd25_save_v8');
+            location.reload();
+        }}
+    ]);
 }
 
 function toggleAutoSave(isChecked) {
     gameState.settings.autoSave = isChecked;
+}
+// NOVO: Função para o Handicap
+function toggleHandicap(isChecked) {
+    gameState.settings.handicap = isChecked;
 }
 
 // -----------------------------------------------------------------------------------
@@ -2561,6 +2884,7 @@ function selectTeam(teamName) {
     gameState.userTeam = teamName;
     const userTeamObj = findTeam(teamName);
     if (userTeamObj) userTeamObj.isUserTeam = true;
+    generateSecretObjective(); // NOVO: Gera objetivo secreto ao iniciar
     openModal('difficulty-modal');
 }
 function setDifficulty(level) {
@@ -2595,19 +2919,25 @@ function renderTeamManagement() {
     const substitutesDiv = document.getElementById('substitutes-list');
     startersDiv.innerHTML = ''; substitutesDiv.innerHTML = '';
     userTeam.players.forEach((player, index) => {
+        const isAdryan = player.rarity === 'Lendário Exclusivo';
+        const sellButton = isAdryan 
+            ? `<button class="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded opacity-50 cursor-not-allowed" title="Este jogador não pode ser vendido.">Vender</button>`
+            : `<button onclick="sellPlayer(${player.id})" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded">Vender</button>`;
+        const salaryText = isAdryan ? 'Sem Custo' : formatCurrency(player.salary);
+
         const playerCardHTML = `
-            <div class="player-card bg-gray-700 p-3 rounded-lg transition-all flex justify-between items-center ${player.suspended > 0 ? 'opacity-50' : ''}">
+            <div class="player-card bg-gray-700 p-3 rounded-lg transition-all flex justify-between items-center ${player.suspended > 0 ? 'opacity-50' : ''} ${isAdryan ? 'card-adryan-exclusive' : ''}">
                 <div>
                     <p class="font-semibold text-sm">${player.name} <span class="text-xs text-muted">${player.position}</span></p>
                     <p class="text-xs text-muted">Idade: ${player.age} | ${player.suspended > 0 ? `Suspenso (${player.suspended}J)` : `OVR: ${player.overall}`} | <span class="text-blue-400">Pot: ${player.potential}</span></p>
-                    <p class="text-xs text-yellow-400">Valor: ${formatCurrency(player.marketValue)}</p>
+                    <p class="text-xs text-yellow-400">Valor: ${player.marketValue > 0 ? formatCurrency(player.marketValue) : 'Inestimável'} | Salário: ${salaryText}</p>
                 </div>
                 <div class="flex items-center">
                     <div class="w-16 text-xs mr-4">
                         <div class="flex items-center" title="Moral"><span class="w-2 h-2 rounded-full bg-yellow-500 mr-1"></span><div class="w-full morale-bar-bg rounded-full h-1.5"><div class="morale-bar h-1.5 rounded-full" style="width: ${player.morale}%"></div></div></div>
                         <div class="flex items-center" title="Físico"><span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span><div class="w-full fitness-bar-bg rounded-full h-1.5"><div class="fitness-bar h-1.5 rounded-full" style="width: ${player.fitness}%"></div></div></div>
                     </div>
-                    <button onclick="sellPlayer(${player.id})" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded">Vender</button>
+                    ${sellButton}
                 </div>
             </div>`;
         if (index < 11) {
@@ -2692,6 +3022,7 @@ function renderTransfers() {
     `;
 
     const transferBody = document.getElementById('transfer-list-body');
+    transferBody.innerHTML = ''; // Limpa a tabela
     const searchTerm = document.getElementById('player-search-input').value.toLowerCase();
     
     const allPlayersForSale = [...gameState.teams, ...gameState.southAmericanTeams]
@@ -2739,6 +3070,13 @@ function buyPlayer(playerId, teamName) {
         return;
     }
     
+    // NOVO: Lógica de aceitação do jogador
+    const acceptance = evaluateOffer(player, userTeam);
+    if (!acceptance.accepted) {
+        addMessage(`Agente de ${player.name}`, `Proposta recusada. Motivo: ${acceptance.reason}`);
+        return;
+    }
+    
     gameState.budget -= finalPrice;
     addTransaction(`Compra de ${player.name} (${teamName})`, finalPrice, 'expense');
     
@@ -2758,24 +3096,33 @@ function sellPlayer(playerId) {
     const playerIndex = userTeam.players.findIndex(p => p.id === playerId);
     if (playerIndex === -1) return;
 
+    const player = userTeam.players[playerIndex];
+    if (player.rarity === 'Lendário Exclusivo') return; // Não pode vender o Adryan
+
     if (userTeam.players.length <= 18) {
         showMessage('Elenco Mínimo', 'Você não pode ter menos de 18 jogadores no elenco.');
         return;
     }
-
-    const [player] = userTeam.players.splice(playerIndex, 1);
-    const saleValue = Math.round(player.marketValue * getRandomInt(80, 110) / 100);
-    gameState.budget += saleValue;
-    addTransaction(`Venda de ${player.name}`, saleValue, 'income');
     
-    const allPossibleTeams = [...gameState.teams, ...gameState.southAmericanTeams];
-    const randomTeam = getRandom(allPossibleTeams.filter(t => t.name !== userTeam.name));
-    player.teamName = randomTeam.name;
-    randomTeam.players.push(player);
+    // NOVO: Modal de confirmação com valor de venda
+    const saleValue = Math.round(player.marketValue * getRandomInt(80, 110) / 100);
+    showMessage('Confirmar Venda', `Tem certeza que deseja vender ${player.name} por ${formatCurrency(saleValue)}?`, [
+        { text: 'Cancelar', class: 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg' },
+        { text: 'Vender', class: 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg', callback: () => {
+            userTeam.players.splice(playerIndex, 1);
+            gameState.budget += saleValue;
+            addTransaction(`Venda de ${player.name}`, saleValue, 'income');
+            
+            const allPossibleTeams = [...gameState.teams, ...gameState.southAmericanTeams];
+            const randomTeam = getRandom(allPossibleTeams.filter(t => t.name !== userTeam.name));
+            player.teamName = randomTeam.name;
+            randomTeam.players.push(player);
 
-    showMessage('Vendido!', `${player.name} foi vendido por ${formatCurrency(saleValue)} para o ${randomTeam.name}!`);
-    renderTeamManagement();
-    updateCareerDashboard();
+            showToast(`${player.name} foi vendido por ${formatCurrency(saleValue)} para o ${randomTeam.name}!`);
+            renderTeamManagement();
+            updateCareerDashboard();
+        }}
+    ]);
 }
 
 function renderCalendar() {
@@ -2907,6 +3254,14 @@ function renderTactics() {
     document.getElementById('style-select').value = gameState.tactics.style;
     substitutionState.isTacticsScreen = true;
     renderTacticsPlayerLists();
+    // NOVO: Renderizar química
+    const userTeam = findTeam(gameState.userTeam);
+    const chemistry = calculateTeamChemistry(userTeam);
+    const chemistryDisplay = document.getElementById('team-chemistry-display');
+    chemistryDisplay.innerHTML = `
+        <h4 class="font-semibold text-lg">Química do Time</h4>
+        <p class="text-3xl font-bold ${chemistry > 70 ? 'text-green-400' : chemistry > 40 ? 'text-yellow-400' : 'text-red-400'}">${chemistry}%</p>
+    `;
 }
 function renderTacticsPlayerLists() {
     renderSubstitutionPlayerLists('tactics-starters-list', 'tactics-bench-list');
@@ -2930,6 +3285,7 @@ function renderSubstitutionPlayerLists(startersId, benchId) {
 function updateTactics() {
     gameState.tactics.formation = document.getElementById('formation-select').value;
     gameState.tactics.style = document.getElementById('style-select').value;
+    renderTactics(); // NOVO: Atualiza a química ao mudar táticas
 }
 function saveTactics() {
     const userTeam = findTeam(gameState.userTeam);
@@ -2989,7 +3345,10 @@ function renderNewspapers() {
 function generateCbfdNews(round, customEvent = null) {
     if (customEvent) {
         gameState.news.unshift({ ...customEvent, date: new Date().toISOString() });
+        return; // Retorna para não gerar notícia de jogo se for um evento customizado
     }
+    
+    if (!round) return;
 
     const userMatch = round.matches.find(m => m.home === gameState.userTeam || m.away === gameState.userTeam);
     
@@ -3096,9 +3455,12 @@ function addTransaction(description, amount, type) {
 function renderFinances() {
     const { stadium, club } = gameState;
     
+    // NOVO: Fator de custo da dificuldade
+    const difficultyCostFactor = gameState.difficulty === 'easy' ? 0.7 : gameState.difficulty === 'goat' ? 1.3 : 1.0;
+    
     // Stadium
     const nextStadiumLevel = stadium.level + 1;
-    const upgradeStadiumCost = 1000000 * Math.pow(nextStadiumLevel, 2);
+    const upgradeStadiumCost = Math.round(1000000 * Math.pow(nextStadiumLevel, 2) * difficultyCostFactor);
     document.getElementById('stadium-level').innerText = stadium.level;
     document.getElementById('stadium-capacity').innerText = stadium.capacity.toLocaleString('pt-BR');
     document.getElementById('upgrade-stadium-cost').innerText = formatCurrency(upgradeStadiumCost);
@@ -3111,7 +3473,7 @@ function renderFinances() {
     structureTypes.forEach(type => {
         const level = club[type + 'Level'];
         const nextLevel = level + 1;
-        const upgradeCost = 500000 * Math.pow(nextLevel, 2.2);
+        const upgradeCost = Math.round(500000 * Math.pow(nextLevel, 2.2) * difficultyCostFactor);
         
         document.getElementById(`${type}-level`).innerText = level;
         document.getElementById(`upgrade-${type}-cost`).innerText = formatCurrency(upgradeCost);
@@ -3152,6 +3514,22 @@ function renderFinances() {
     } else {
         reportDiv.innerHTML = `<p class="text-muted">Nenhuma transação registrada nesta temporada.</p>`;
     }
+    
+    // NOVO: Renderiza o último relatório mensal
+    const monthlyReportDiv = document.getElementById('monthly-financial-report');
+    const lastReport = gameState.monthlyReports[0];
+    if (lastReport) {
+        const balance = lastReport.totalIncome - lastReport.totalExpenses;
+        const balanceColor = balance >= 0 ? 'text-green-400' : 'text-red-400';
+        monthlyReportDiv.innerHTML = `
+            <p class="font-semibold">Relatório de ${lastReport.monthName}/${lastReport.year}</p>
+            <div class="flex justify-between"><span>Receitas:</span> <span class="text-green-400">+${formatCurrency(lastReport.totalIncome)}</span></div>
+            <div class="flex justify-between"><span>Despesas:</span> <span class="text-red-400">-${formatCurrency(lastReport.totalExpenses)}</span></div>
+            <div class="flex justify-between font-bold border-t border-custom mt-1 pt-1"><span>Balanço:</span> <span class="${balanceColor}">${formatCurrency(balance)}</span></div>
+        `;
+    } else {
+        monthlyReportDiv.innerHTML = `<p class="text-muted">Nenhum relatório gerado ainda.</p>`;
+    }
 }
 function renderSeasonGoals() {
     const card = document.getElementById('season-goals-card');
@@ -3165,26 +3543,37 @@ function renderSeasonGoals() {
 
     const posMet = currentPosition > 0 && currentPosition <= posGoal;
     const winsMet = currentWins >= winsGoal;
+    
+    // NOVO: Exibição do objetivo secreto (apenas uma dica)
+    let secretGoalText = '';
+    if (gameState.goals.secret) {
+        const { type, competition } = gameState.goals.secret;
+        if (type === 'league_pos') secretGoalText = 'A diretoria espera um bom desempenho na liga.';
+        if (type === 'cup_run') secretGoalText = `Ir bem na ${competition} é uma prioridade.`;
+    }
 
     card.innerHTML = `
-        <h4 class="font-semibold mb-3 text-lg border-b border-custom pb-2">Metas da Temporada</h4>
+        <h4 class="font-semibold mb-3 text-lg border-b border-custom pb-2">Metas da Diretoria</h4>
         <div class="space-y-2 text-sm">
             <p>Posição na Liga: <strong class="${posMet ? 'text-green-400' : 'text-red-400'}">${currentPosition > 0 ? currentPosition + 'º' : 'N/A'}</strong> (Meta: ${posGoal}º ou melhor)</p>
             <p>Vitórias na Liga: <strong class="${winsMet ? 'text-green-400' : 'text-red-400'}">${currentWins}</strong> (Meta: ${winsGoal})</p>
             <p class="text-xs text-muted mt-2">Confiança da diretoria: ${100 - (gameState.consecutiveFailures * 20)}%</p>
+            <p class="text-xs text-yellow-400 italic mt-1">${secretGoalText}</p>
         </div>
     `;
 }
 
 function upgradeStructure(type) {
     let level, cost, name;
+    const difficultyCostFactor = gameState.difficulty === 'easy' ? 0.7 : gameState.difficulty === 'goat' ? 1.3 : 1.0;
+    
     if (type === 'stadium') {
         level = gameState.stadium.level;
-        cost = 1000000 * Math.pow(level + 1, 2);
+        cost = Math.round(1000000 * Math.pow(level + 1, 2) * difficultyCostFactor);
         name = 'Estádio';
     } else {
         level = gameState.club[type + 'Level'];
-        cost = 500000 * Math.pow(level + 1, 2.2);
+        cost = Math.round(500000 * Math.pow(level + 1, 2.2) * difficultyCostFactor);
         const names = { academy: 'Academia', medical: 'Centro Médico', marketing: 'Marketing', scouting: 'Scouting'};
         name = names[type];
     }
@@ -3219,8 +3608,8 @@ function buyBus() {
     }
 }
 
-function addMessage(from, text, isRead = false) {
-    gameState.messages.unshift({ from, text, date: new Date().toISOString(), read: isRead });
+function addMessage(from, text, isRead = false, options = null, metadata = {}) {
+    gameState.messages.unshift({ id: Date.now(), from, text, date: new Date().toISOString(), read: isRead, options, metadata });
     if (gameState.messages.length > 30) {
         gameState.messages = gameState.messages.slice(0, 30);
     }
@@ -3234,17 +3623,249 @@ function renderMessages() {
         return;
     }
     gameState.messages.forEach(msg => {
+        let optionsHTML = '';
+        if (msg.options && !msg.responded) {
+            optionsHTML = '<div class="flex gap-2 mt-3">';
+            msg.options.forEach(opt => {
+                optionsHTML += `<button class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded-lg" onclick="${opt.action}">${opt.text}</button>`;
+            });
+            optionsHTML += '</div>';
+        }
+        
         feed.innerHTML += `
             <div class="border-b border-custom pb-3 last:border-b-0 ${!msg.read ? 'bg-indigo-900/20' : ''} p-3 rounded-lg">
                 <p class="font-semibold text-purple-400">De: ${msg.from}</p>
                 <p class="text-sm mt-1">${msg.text}</p>
                 <p class="text-xs text-muted text-right mt-1">${new Date(msg.date).toLocaleString('pt-BR')}</p>
+                ${optionsHTML}
             </div>
         `;
         msg.read = true;
     });
     updateCareerDashboard();
 }
+
+// ===================================================================================
+// INÍCIO: NOVOS SISTEMAS DE REALISMO
+// ===================================================================================
+
+// -----------------------------------------------------------------------------------
+// SISTEMA DE QUÍMICA
+// -----------------------------------------------------------------------------------
+function calculateTeamChemistry(team, players) {
+    const starters = players || team.players.slice(0, 11);
+    if (starters.length === 0) return 0;
+    
+    let totalChemistryPoints = 0;
+    const maxPossiblePoints = starters.length * 10; // Max 10 pontos por jogador
+
+    for (let i = 0; i < starters.length; i++) {
+        let playerPoints = 0;
+        for (let j = 0; j < starters.length; j++) {
+            if (i === j) continue;
+            
+            // Bônus de nacionalidade
+            if (starters[i].nationality === starters[j].nationality) {
+                playerPoints += 0.5;
+            }
+            // Bônus de tempo de clube (simplificado)
+            if (starters[i].teamName === starters[j].teamName) {
+                playerPoints += 0.2;
+            }
+        }
+        totalChemistryPoints += Math.min(10, playerPoints); // Limita os pontos por jogador
+    }
+    
+    return Math.round((totalChemistryPoints / maxPossiblePoints) * 100);
+}
+
+// -----------------------------------------------------------------------------------
+// SISTEMA DE TRANSFERÊNCIA REALISTA
+// -----------------------------------------------------------------------------------
+function evaluateOffer(player, offeringTeam) {
+    // Jogador avalia a oferta
+    let acceptanceScore = 0;
+    
+    // Reputação do time
+    if (offeringTeam.reputation > findTeam(player.teamName).reputation) {
+        acceptanceScore += 3;
+    }
+    // Títulos recentes
+    if (offeringTeam.trophies > 0) {
+        acceptanceScore += 2;
+    }
+    // Salário
+    const proposedSalary = Math.round(player.marketValue / 100 + player.overall * 120); // Simula uma proposta salarial
+    if (proposedSalary > player.salary) {
+        acceptanceScore += 4;
+    }
+    
+    if (acceptanceScore >= 5) {
+        return { accepted: true };
+    } else {
+        let reason = "o projeto esportivo não me pareceu atraente.";
+        if (acceptanceScore < 2) reason = "o seu clube não tem o prestígio que eu busco na minha carreira.";
+        if (proposedSalary <= player.salary) reason = "a proposta salarial não foi boa o suficiente.";
+        return { accepted: false, reason };
+    }
+}
+
+function generateAIOffers() {
+    if (Math.random() > 0.2) return; // 20% de chance por rodada
+
+    const userTeam = findTeam(gameState.userTeam);
+    const playerToTarget = getRandom(userTeam.players.filter(p => p.potential > 85 || p.overall > 80));
+    if (!playerToTarget) return;
+
+    const interestedTeam = getRandom(gameState.teams.filter(t => !t.isUserTeam && t.budget > playerToTarget.marketValue));
+    if (!interestedTeam) return;
+
+    const offerValue = Math.round(playerToTarget.marketValue * getRandomInt(90, 120) / 100);
+    
+    const messageText = `Recebemos uma proposta oficial de ${formatCurrency(offerValue)} do ${interestedTeam.name} pelo jogador ${playerToTarget.name}. O que devemos fazer?`;
+    const metadata = { type: 'transfer_offer', playerId: playerToTarget.id, teamName: interestedTeam.name, value: offerValue };
+    const options = [
+        { text: 'Aceitar', action: `handleTransferResponse(${Date.now()}, 'accept')` },
+        { text: 'Recusar', action: `handleTransferResponse(${Date.now()}, 'reject')` },
+        { text: 'Contraproposta', action: `handleTransferResponse(${Date.now()}, 'counter')` }
+    ];
+    
+    addMessage(`Diretoria`, messageText, false, options, metadata);
+}
+
+function handleTransferResponse(msgId, response) {
+    const message = gameState.messages.find(m => m.id === msgId);
+    if (!message || message.responded) return;
+    
+    message.responded = true;
+    const { playerId, teamName, value } = message.metadata;
+    const userTeam = findTeam(gameState.userTeam);
+    const player = userTeam.players.find(p => p.id === playerId);
+    const buyingTeam = findTeam(teamName);
+
+    if (response === 'accept') {
+        gameState.budget += value;
+        addTransaction(`Venda de ${player.name} para ${teamName}`, value, 'income');
+        
+        const playerIndex = userTeam.players.findIndex(p => p.id === playerId);
+        userTeam.players.splice(playerIndex, 1);
+        
+        player.teamName = buyingTeam.name;
+        buyingTeam.players.push(player);
+        
+        addMessage('Diretoria', `A venda de ${player.name} foi concluída. O valor de ${formatCurrency(value)} foi adicionado ao nosso orçamento.`);
+    } else if (response === 'reject') {
+        addMessage('Diretoria', `Recusamos a proposta por ${player.name}. Ele permanece no clube.`);
+    } else if (response === 'counter') {
+        const counterValue = Math.round(value * 1.25); // Pede 25% a mais
+        
+        // IA decide se aceita a contraproposta
+        if (Math.random() < 0.5 && buyingTeam.budget > counterValue) {
+            gameState.budget += counterValue;
+            addTransaction(`Venda de ${player.name} para ${teamName}`, counterValue, 'income');
+            
+            const playerIndex = userTeam.players.findIndex(p => p.id === playerId);
+            userTeam.players.splice(playerIndex, 1);
+            
+            player.teamName = buyingTeam.name;
+            buyingTeam.players.push(player);
+            
+            addMessage('Diretoria', `NEGÓCIO FECHADO! O ${teamName} aceitou nossa contraproposta de ${formatCurrency(counterValue)} por ${player.name}!`);
+        } else {
+            addMessage('Diretoria', `O ${teamName} recusou nossa contraproposta. As negociações por ${player.name} foram encerradas.`);
+        }
+    }
+    renderMessages();
+}
+
+
+// -----------------------------------------------------------------------------------
+// SISTEMA DE MENSAGENS DE JOGADORES
+// -----------------------------------------------------------------------------------
+function triggerPlayerMessage() {
+    if (Math.random() > 0.15) return; // 15% de chance por rodada
+
+    const userTeam = findTeam(gameState.userTeam);
+    const unhappyPlayer = userTeam.players.find(p => p.morale < 40 && !p.promisedMinutes);
+    
+    if (unhappyPlayer) {
+        const messageText = `Chefe, não estou feliz com meus minutos em campo. Sinto que posso contribuir mais. Preciso de uma oportunidade.`;
+        const metadata = { type: 'player_complaint', playerId: unhappyPlayer.id };
+        const options = [
+            { text: 'Prometer', action: `handlePlayerResponse(${Date.now()}, 'promise')` },
+            { text: 'Ignorar', action: `handlePlayerResponse(${Date.now()}, 'ignore')` },
+            { text: 'Ser Sincero', action: `handlePlayerResponse(${Date.now()}, 'sincere')` }
+        ];
+        addMessage(unhappyPlayer.name, messageText, false, options, metadata);
+    }
+}
+
+function handlePlayerResponse(msgId, response) {
+    const message = gameState.messages.find(m => m.id === msgId);
+    if (!message || message.responded) return;
+
+    message.responded = true;
+    const player = findTeam(gameState.userTeam).players.find(p => p.id === message.metadata.playerId);
+    if (!player) return;
+
+    if (response === 'promise') {
+        player.promisedMinutes = true;
+        player.morale = Math.min(100, player.morale + 10);
+        addMessage(player.name, 'Obrigado pela confiança, chefe. Vou dar o meu melhor.');
+    } else if (response === 'ignore') {
+        player.morale = Math.max(0, player.morale - 15);
+        // Nenhuma resposta do jogador, ele fica mais infeliz
+    } else if (response === 'sincere') {
+        player.morale = Math.max(0, player.morale - 5);
+        addMessage(player.name, 'Entendo, chefe. Vou continuar trabalhando duro para ganhar meu espaço.');
+    }
+    
+    // Se a moral ficar muito baixa, gera notícia
+    if (player.morale < 20) {
+        const news = { headline: "CRISE NO VESTIÁRIO!", story: `Fontes indicam que ${player.name} está extremamente insatisfeito no ${gameState.userTeam} e pode forçar uma saída na próxima janela de transferências.`, source: "Fofocas CBFD" };
+        generateCbfdNews(null, news);
+    }
+    
+    renderMessages();
+}
+
+// -----------------------------------------------------------------------------------
+// SISTEMA DE ECONOMIA E OBJETIVOS
+// -----------------------------------------------------------------------------------
+function generateMonthlyReport(currentDate) {
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    const monthName = currentDate.toLocaleString('pt-BR', { month: 'long' });
+    
+    const monthlyTransactions = gameState.transactions.filter(t => {
+        const tDate = new Date(t.date);
+        return tDate.getMonth() === month && tDate.getFullYear() === year;
+    });
+    
+    const totalIncome = monthlyTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const totalExpenses = monthlyTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    
+    gameState.monthlyReports.unshift({
+        month, year, monthName, totalIncome, totalExpenses
+    });
+    
+    if (gameState.monthlyReports.length > 12) {
+        gameState.monthlyReports.pop();
+    }
+}
+
+function generateSecretObjective() {
+    const objectives = [
+        { type: 'league_pos', target: 4, reward: 5000000, competition: 'CBFD League One' },
+        { type: 'cup_run', target: 'semifinal', reward: 3000000, competition: 'Copa CBFD' }
+    ];
+    gameState.goals.secret = getRandom(objectives);
+}
+
+
+// ===================================================================================
+// FIM: NOVOS SISTEMAS DE REALISMO
+// ===================================================================================
 
 </script>
 
