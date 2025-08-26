@@ -1694,12 +1694,14 @@ function simulateMatch(homeTeam, awayTeam, isQuickSim = false) {
             if (Math.random() < goalChanceBase * homeScoreFactor) {
                 homeGoals++;
                 const scorer = getRandom(homeStarters.filter(p => normalizePosition(p.position) !== 'GOL'));
-                events.push({ minute, type: 'goal', team: homeTeam.name, player: scorer.name, playerId: scorer.id, score: `${homeGoals} - ${awayGoals}` });
+                // BUG FIX: A propriedade 'score' foi removida do evento de gol para evitar que o placar seja resetado.
+                events.push({ minute, type: 'goal', team: homeTeam.name, player: scorer.name, playerId: scorer.id });
             }
             if (Math.random() < goalChanceBase * awayScoreFactor) {
                 awayGoals++;
                 const scorer = getRandom(awayStarters.filter(p => normalizePosition(p.position) !== 'GOL'));
-                events.push({ minute, type: 'goal', team: awayTeam.name, player: scorer.name, playerId: scorer.id, score: `${homeGoals} - ${awayGoals}` });
+                // BUG FIX: A propriedade 'score' foi removida do evento de gol para evitar que o placar seja resetado.
+                events.push({ minute, type: 'goal', team: awayTeam.name, player: scorer.name, playerId: scorer.id });
             }
 
             // Chances de Cartões e Lesões (mantido como estava)
@@ -1819,13 +1821,14 @@ function resumeSimulation() {
                 p.classList.add('goal-event');
                 icon = '<i class="fas fa-futbol text-green-400"></i>';
                 text = `<strong>GOL!</strong> de ${event.player} para ${event.team}!`;
-                // Update score display only if it's a goal event
-                if (event.score) {
-                    const [h, a] = event.score.split(' - ');
-                    simulationState.homeGoals = parseInt(h);
-                    simulationState.awayGoals = parseInt(a);
-                    document.getElementById('sim-score').innerText = event.score;
+                // BUG FIX: O placar agora é incrementado em vez de ser sobrescrito.
+                // Isso garante que o placar seja mantido corretamente durante todo o jogo.
+                if (event.team === simulationState.homeTeam.name) {
+                    simulationState.homeGoals++;
+                } else {
+                    simulationState.awayGoals++;
                 }
+                document.getElementById('sim-score').innerText = `${simulationState.homeGoals} - ${simulationState.awayGoals}`;
             } else if (event.type === 'card-yellow') {
                 p.classList.add('card-yellow-event');
                 icon = '<i class="fas fa-square text-yellow-400"></i>';
