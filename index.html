@@ -176,9 +176,36 @@
 
         /* === INÍCIO: NOVOS ESTILOS PARA A LOJA === */
 
+        /* Tela de Carregamento da Loja */
+        #shop-loading-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url('https://i.imgur.com/ujikaEo.jpeg');
+            background-size: cover;
+            background-position: center;
+            z-index: 2000;
+            display: none; /* Alterado por JS */
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 2rem;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        #loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
         /* Hero da Loja */
         #shop-hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://i.imgur.com/J7ruPaK.png');
+            position: relative; /* Necessário para posicionar o botão CBDRAFT */
+            background: url('https://i.imgur.com/J7ruPaK.png'); /* Nova imagem de fundo */
             background-size: cover;
             background-position: center;
             border-radius: 0.75rem; /* rounded-xl */
@@ -187,41 +214,69 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        /* Título Neon */
-        .neon-title {
-            font-size: 6rem; /* text-8xl ou similar */
-            font-weight: 900; /* font-black */
-            color: #fff;
-            text-shadow:
-                0 0 7px #fff,
-                0 0 10px #fff,
-                0 0 21px #fff,
-                0 0 42px #d300c4,
-                0 0 82px #d300c4,
-                0 0 92px #d300c4,
-                0 0 102px #d300c4,
-                0 0 151px #d300c4;
+            overflow: hidden; /* Garante que o botão não saia dos limites */
         }
         
-        /* Botões da Loja */
-        .shop-action-button {
+        /* Botão CBDRAFT */
+        #cbdraft-button {
+            position: absolute;
+            bottom: 16%; /* Posição vertical estimada */
+            left: 27%; /* Posição horizontal estimada */
+            transform: translateX(-50%);
             background-color: #d300c4; /* Cor rosa/neon */
             color: white;
-            padding: 1rem 1.5rem; /* py-4 px-6 */
+            padding: 1rem 2.5rem; /* py-4 px-10 */
             border-radius: 0.5rem; /* rounded-lg */
-            font-weight: 700; /* font-bold */
+            font-weight: 900; /* font-black */
+            font-size: 1.5rem; /* text-2xl */
             text-transform: uppercase;
             transition: all 0.2s ease-in-out;
-            border: 2px solid #d300c4;
-            box-shadow: 0 0 5px #d300c4, 0 0 10px #d300c4;
+            border: 3px solid #f0abfc;
+            box-shadow: 0 0 8px #d300c4, 0 0 20px #d300c4, inset 0 0 5px rgba(255,255,255,0.5);
+            text-shadow: 0 0 5px #fff;
+        }
+        #cbdraft-button:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 0 12px #d300c4, 0 0 30px #d300c4, 0 0 40px #d300c4, inset 0 0 8px rgba(255,255,255,0.6);
         }
 
-        .shop-action-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 8px #d300c4, 0 0 20px #d300c4, 0 0 30px #d300c4;
+        /* Modal CBDRAFT */
+        #pack-animation-container {
+            width: 250px;
+            height: 350px;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            background-color: #111;
         }
+        @keyframes rgb-glow {
+            0% { box-shadow: 0 0 20px 5px #ff0000, 0 0 30px 10px #ff00de; }
+            25% { box-shadow: 0 0 20px 5px #00ff00, 0 0 30px 10px #00ffea; }
+            50% { box-shadow: 0 0 20px 5px #0000ff, 0 0 30px 10px #005eff; }
+            75% { box-shadow: 0 0 20px 5px #ffff00, 0 0 30px 10px #ff8c00; }
+            100% { box-shadow: 0 0 20px 5px #ff0000, 0 0 30px 10px #ff00de; }
+        }
+        .pack-opening-animation {
+            animation: rgb-glow 1.5s linear infinite;
+        }
+        
+        /* Cards de Jogador por Raridade */
+        .draft-card {
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+            border: 2px solid;
+            min-width: 280px;
+        }
+        .card-comum { background: linear-gradient(45deg, #4b5563, #1f2937); border-color: #6b7280; }
+        .card-raro { background: linear-gradient(45deg, #1d4ed8, #3b82f6); border-color: #60a5fa; }
+        .card-epico { background: linear-gradient(45deg, #7e22ce, #a855f7); border-color: #c084fc; }
+        .card-lendario { background: linear-gradient(45deg, #f59e0b, #fbbf24); border-color: #fcd34d; }
 
         /* Miniatura no botão do menu */
         .shop-thumbnail {
@@ -241,6 +296,12 @@
         <img id="orientation-image" src="https://i.imgur.com/LGK2wCs.jpeg" alt="Vire o dispositivo para a horizontal">
     </div>
 
+    <!-- INÍCIO: Overlay de Carregamento da Loja -->
+    <div id="shop-loading-overlay">
+        <div id="loading-spinner"></div>
+    </div>
+    <!-- FIM: Overlay de Carregamento da Loja -->
+
     <div id="game-container" class="max-w-7xl mx-auto p-2 sm:p-4">
 
         <div id="main-menu" class="screen text-center">
@@ -250,7 +311,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
                     <button onclick="showScreen('career-mode')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-trophy mr-2"></i> Modo Carreira</button>
                     <button onclick="showScreen('competitions')" class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"><i class="fas fa-list-ol mr-2"></i> Competições</button>
-                    <button onclick="showScreen('shop')" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg flex items-center justify-center">
+                    <!-- Botão da Loja modificado para chamar a tela de carregamento -->
+                    <button onclick="openShopWithLoading()" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg flex items-center justify-center">
                         <img src="https://i.imgur.com/J7ruPaK.png" alt="Shop Thumbnail" class="shop-thumbnail">
                         <i class="fas fa-store mr-2"></i> 
                         <span>Loja</span>
@@ -300,6 +362,8 @@
                             <h4 class="font-semibold mb-3 text-lg border-b border-custom pb-2">Gerenciamento</h4>
                             <div id="management-buttons" class="space-y-2">
                                 <button onclick="showScreen('team-management')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-users w-6 text-center mr-2"></i> Elenco</button>
+                                <!-- Botão do Inventário Adicionado -->
+                                <button onclick="showScreen('inventory')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-archive w-6 text-center mr-2"></i> Inventário CBDRAFT</button>
                                 <button onclick="showScreen('tactics')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-clipboard-list w-6 text-center mr-2"></i> Táticas</button>
                                 <button id="transfers-button" onclick="showScreen('transfers')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-exchange-alt w-6 text-center mr-2"></i> Transferências</button>
                                 <button onclick="showScreen('finances')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all"><i class="fas fa-landmark w-6 text-center mr-2"></i> Finanças e Clube</button>
@@ -328,6 +392,19 @@
                 </div>
             </div>
         </div>
+
+        <!-- INÍCIO: Tela do Inventário CBDRAFT -->
+        <div id="inventory" class="screen hidden">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showScreen('career-mode')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"><i class="fas fa-arrow-left mr-2"></i>Voltar</button>
+                <h2 class="text-3xl font-bold">Inventário CBDRAFT</h2>
+                <div></div>
+            </div>
+            <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Jogadores do inventário serão renderizados aqui pelo JS -->
+            </div>
+        </div>
+        <!-- FIM: Tela do Inventário CBDRAFT -->
 
         <div id="newspapers" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
@@ -419,21 +496,14 @@
                 <div></div>
             </div>
 
+            <!-- Hero da Loja Modificado -->
             <div id="shop-hero" class="mb-8">
-                <h1 class="neon-title text-center">CBFD 25</h1>
-            </div>
-
-            <div id="shop-actions" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                <button onclick="openPlayerPaks()" class="shop-action-button">
-                    Player Paks
-                </button>
-                <button onclick="openCustomizations()" class="shop-action-button">
-                    Customizations
-                </button>
-                <button onclick="openCoinsGems()" class="shop-action-button">
-                    Coins e Gems
+                <!-- O título neon foi removido para dar mais destaque à imagem e ao novo botão -->
+                <button id="cbdraft-button" onclick="openCBDraft()">
+                    CBDRAFT
                 </button>
             </div>
+            <!-- As ações antigas foram removidas para dar lugar ao botão CBDRAFT posicionado -->
         </div>
         <div id="tactics" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
@@ -668,6 +738,31 @@
             <button onclick="handleFired()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg">Procurar Novo Emprego</button>
         </div>
     </div>
+
+    <!-- INÍCIO: Modal do CBDRAFT -->
+    <div id="cbdraft-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-card rounded-xl p-8 text-center shadow-2xl slide-in-up border border-custom w-full max-w-lg relative">
+             <button onclick="closeModal('cbdraft-modal')" class="absolute top-4 right-4 text-2xl text-muted hover:text-white">&times;</button>
+            <h3 class="text-3xl font-bold mb-4">CBDRAFT</h3>
+            <p class="text-muted mb-6">Escolha um pacote para abrir e testar sua sorte!</p>
+            
+            <div id="pack-selection" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <button onclick="openPack('Comum')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-4 rounded-lg">Pacote Comum</button>
+                <button onclick="openPack('Raro')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-lg">Pacote Raro</button>
+                <button onclick="openPack('Épico')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-4 rounded-lg">Pacote Épico</button>
+                <button onclick="openPack('Lendário')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-4 rounded-lg">Pacote Lendário</button>
+            </div>
+
+            <div id="pack-animation-container" class="hidden">
+                <!-- A animação acontece aqui via CSS -->
+            </div>
+
+            <div id="player-card-display" class="hidden">
+                <!-- O card do jogador draftado aparece aqui -->
+            </div>
+        </div>
+    </div>
+    <!-- FIM: Modal do CBDRAFT -->
     
     <div id="toast-container"></div>
 
@@ -680,7 +775,7 @@
 
 <script>
 // ===================================================================================
-// JOGO CBFD 25 - LÓGICA PRINCIPAL (v8.3 - Update Interativo)
+// JOGO CBFD 25 - LÓGICA PRINCIPAL (v8.4 - Update CBDRAFT)
 // ===================================================================================
 
 // -----------------------------------------------------------------------------------
@@ -698,41 +793,230 @@ let substitutionState = {
     isTacticsScreen: false // Flag para diferenciar da substituição em jogo
 };
 
-// --- INÍCIO: LÓGICA DA LOJA E FUNÇÕES DOS BOTÕES ---
+// --- INÍCIO: LÓGICA DA LOJA E CBDRAFT ---
 
 /**
- * Exibe uma mensagem informativa na tela usando o modal de mensagens padrão.
- * @param {string} title - O título a ser exibido no modal.
- * @param {string} contentHTML - O HTML do conteúdo a ser exibido no corpo do modal.
+ * Exibe a tela de carregamento por 10 segundos e depois abre a loja.
  */
-function openShopModal(title, contentHTML) {
-    // Extrai o texto do HTML para usar na função showMessage
-    const textContent = contentHTML.replace(/<[^>]*>/g, '');
-    showMessage(title, textContent);
+function openShopWithLoading() {
+    const loadingOverlay = document.getElementById('shop-loading-overlay');
+    loadingOverlay.style.display = 'flex';
+
+    setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+        showScreen('shop');
+    }, 10000); // 10 segundos de carregamento
 }
 
-// Funções chamadas pelos botões da loja
-function openPlayerPaks() {
-    openShopModal(
-        'Player Paks',
-        '<p class="text-lg">Pacotes de jogadores com itens exclusivos estarão disponíveis aqui em breve. Fique de olho para fortalecer seu elenco!</p>'
-    );
+/**
+ * Abre a interface do CBDRAFT.
+ */
+function openCBDraft() {
+    if (!gameState.userTeam) {
+        showMessage('Aviso', 'Para jogar o CBDRAFT, você precisa ter um modo carreira salvo.');
+        return;
+    }
+    // Reseta a view do modal
+    document.getElementById('pack-selection').classList.remove('hidden');
+    document.getElementById('pack-animation-container').classList.add('hidden');
+    document.getElementById('player-card-display').classList.add('hidden');
+    openModal('cbdraft-modal');
 }
 
-function openCustomizations() {
-    openShopModal(
-        'Customizations',
-        '<p class="text-lg">Personalize seus uniformes, escudos e estádio. A seção de customizações está em desenvolvimento e chegará em breve!</p>'
-    );
+/**
+ * Determina a raridade de um jogador com base nas probabilidades.
+ * @returns {string} A raridade ('Comum', 'Raro', 'Épico', 'Lendário').
+ */
+function determineRarity() {
+    const roll = Math.random() * 100;
+    if (roll <= 5) return 'Lendário';      // 5% de chance
+    if (roll <= 15) return 'Épico';       // 10% de chance (5 + 10)
+    if (roll <= 40) return 'Raro';        // 25% de chance (15 + 25)
+    return 'Comum';                       // 60% de chance (40 + 60)
 }
 
-function openCoinsGems() {
-    openShopModal(
-        'Coins e Gems',
-        '<p class="text-lg">Ainda estamos finalizando os pacotes de V-Coins e Gemas. Em breve você poderá adquirir moedas para acelerar seu progresso!</p>'
-    );
+/**
+ * Gera um jogador para o Draft com atributos baseados na raridade.
+ * @param {string} rarity - A raridade do jogador.
+ * @returns {object} O objeto do jogador gerado.
+ */
+function generateDraftPlayer(rarity) {
+    const basePlayer = generatePlayer(gameState.nextPlayerId++, null, "Inventário", true);
+    let ovrRange, potRange, namePrefix;
+
+    switch (rarity) {
+        case 'Raro':
+            ovrRange = [71, 80]; potRange = [80, 88]; namePrefix = "Raro";
+            break;
+        case 'Épico':
+            ovrRange = [81, 88]; potRange = [88, 92]; namePrefix = "Épico";
+            break;
+        case 'Lendário':
+            ovrRange = [89, 95]; potRange = [93, 99]; namePrefix = "Lendário";
+            break;
+        case 'Comum':
+        default:
+            ovrRange = [60, 70]; potRange = [70, 82]; namePrefix = "Comum";
+            break;
+    }
+
+    basePlayer.overall = getRandomInt(ovrRange[0], ovrRange[1]);
+    basePlayer.potential = getRandomInt(potRange[0], potRange[1]);
+    basePlayer.rarity = rarity; // Adiciona a raridade ao objeto do jogador
+    return basePlayer;
 }
-// --- FIM: LÓGICA DA LOJA E FUNÇÕES DOS BOTÕES ---
+
+/**
+ * Inicia o processo de abertura de pacote.
+ * @param {string} packType - O tipo de pacote (não usado na lógica de chance atual, mas pode ser usado no futuro).
+ */
+function openPack(packType) {
+    const packSelectionDiv = document.getElementById('pack-selection');
+    const animationDiv = document.getElementById('pack-animation-container');
+    const playerCardDiv = document.getElementById('player-card-display');
+
+    // Esconde a seleção de pacotes e mostra a animação
+    packSelectionDiv.classList.add('hidden');
+    playerCardDiv.classList.add('hidden');
+    animationDiv.classList.remove('hidden');
+    animationDiv.classList.add('pack-opening-animation');
+
+    // Simula a animação por 3 segundos
+    setTimeout(() => {
+        animationDiv.classList.add('hidden');
+        animationDiv.classList.remove('pack-opening-animation');
+
+        // Gera o jogador e o exibe
+        const rarity = determineRarity();
+        const player = generateDraftPlayer(rarity);
+        
+        // Adiciona o jogador ao inventário
+        gameState.inventory.push(player);
+        
+        displayDraftedPlayer(player);
+        playerCardDiv.classList.remove('hidden');
+
+        // Mostra a seleção de pacotes novamente para abrir outro
+        packSelectionDiv.classList.remove('hidden');
+    }, 3000);
+}
+
+/**
+ * Renderiza o card do jogador draftado.
+ * @param {object} player - O objeto do jogador.
+ */
+function displayDraftedPlayer(player) {
+    const displayDiv = document.getElementById('player-card-display');
+    const rarityClass = `card-${player.rarity.toLowerCase()}`;
+    const rarityColor = {
+        'Comum': 'text-gray-300',
+        'Raro': 'text-blue-300',
+        'Épico': 'text-purple-300',
+        'Lendário': 'text-yellow-300'
+    }[player.rarity];
+
+    displayDiv.innerHTML = `
+        <div class="draft-card ${rarityClass} slide-in-up">
+            <p class="font-bold text-xl ${rarityColor} uppercase tracking-wider">${player.rarity}</p>
+            <h4 class="text-3xl font-black my-2">${player.name}</h4>
+            <div class="flex justify-around items-center my-4 text-center">
+                <div>
+                    <p class="text-4xl font-bold">${player.overall}</p>
+                    <p class="text-sm text-muted">OVR</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold">${player.position}</p>
+                    <p class="text-sm text-muted">POS</p>
+                </div>
+                <div>
+                    <p class="text-4xl font-bold text-blue-400">${player.potential}</p>
+                    <p class="text-sm text-muted">POT</p>
+                </div>
+            </div>
+            <p class="text-sm">Idade: ${player.age}</p>
+            <p class="text-sm">Valor: ${formatCurrency(player.marketValue)}</p>
+            <p class="mt-4 text-xs text-muted">O jogador foi adicionado ao seu inventário.</p>
+        </div>
+    `;
+}
+
+/**
+ * Renderiza a tela de inventário.
+ */
+function renderInventory() {
+    const grid = document.getElementById('inventory-grid');
+    grid.innerHTML = '';
+
+    if (gameState.inventory.length === 0) {
+        grid.innerHTML = '<p class="text-muted col-span-full text-center">Seu inventário está vazio. Abra pacotes no CBDRAFT!</p>';
+        return;
+    }
+
+    gameState.inventory.forEach(player => {
+        const rarityClass = `card-${player.rarity.toLowerCase()}`;
+        const cardHTML = `
+            <div class="draft-card ${rarityClass}">
+                <p class="font-bold text-lg ${player.rarity.toLowerCase()} uppercase">${player.rarity}</p>
+                <h4 class="text-2xl font-bold my-1">${player.name}</h4>
+                <p class="text-sm text-muted mb-2">${player.position} | Idade: ${player.age}</p>
+                <div class="flex justify-around items-center my-3 text-center">
+                    <div><p class="text-3xl font-bold">${player.overall}</p><p class="text-xs text-muted">OVR</p></div>
+                    <div><p class="text-3xl font-bold text-blue-400">${player.potential}</p><p class="text-xs text-muted">POT</p></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-4">
+                    <button onclick="sellFromInventory(${player.id})" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded-lg text-sm">Vender (${formatCurrency(player.marketValue)})</button>
+                    <button onclick="moveToSquad(${player.id})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-sm">Mandar para Elenco</button>
+                </div>
+            </div>
+        `;
+        grid.innerHTML += cardHTML;
+    });
+}
+
+/**
+ * Vende um jogador do inventário.
+ * @param {number} playerId - O ID do jogador.
+ */
+function sellFromInventory(playerId) {
+    const playerIndex = gameState.inventory.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) return;
+
+    const player = gameState.inventory[playerIndex];
+    gameState.budget += player.marketValue;
+    addTransaction(`Venda de jogador (CBDRAFT): ${player.name}`, player.marketValue, 'income');
+    
+    gameState.inventory.splice(playerIndex, 1);
+    
+    showToast(`${player.name} vendido por ${formatCurrency(player.marketValue)}!`);
+    renderInventory();
+    updateCareerDashboard();
+}
+
+/**
+ * Move um jogador do inventário para o elenco principal.
+ * @param {number} playerId - O ID do jogador.
+ */
+function moveToSquad(playerId) {
+    const playerIndex = gameState.inventory.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) return;
+
+    const userTeam = findTeam(gameState.userTeam);
+    if (userTeam.players.length >= 26) {
+        showMessage('Elenco Cheio', 'Seu elenco está cheio (máx 26). Venda um jogador do elenco principal antes de adicionar outro.');
+        return;
+    }
+
+    const player = gameState.inventory[playerIndex];
+    player.teamName = userTeam.name; // Atualiza o time do jogador
+    userTeam.players.push(player);
+    
+    gameState.inventory.splice(playerIndex, 1);
+
+    showMessage('Transferência Concluída!', `${player.name} foi adicionado ao elenco principal!`);
+    renderInventory();
+}
+
+// --- FIM: LÓGICA DA LOJA E CBDRAFT ---
 
 
 // -----------------------------------------------------------------------------------
@@ -908,10 +1192,11 @@ function generateTeam(teamData) {
 function initGame(isNewGame = true) {
     if (isNewGame) {
         gameState = {
-            version: "8.3", // Updated version
+            version: "8.4", // Updated version
             season: 2025, userTeam: null, nextPlayerId: 1,
             difficulty: 'normal',
             budget: 5000000,
+            inventory: [], // INÍCIO: Inventário CBDRAFT
             transferBanSeasons: 0, // NEW: Transfer ban state
             stadium: { level: 1, capacity: 10000 },
             club: { 
@@ -1244,6 +1529,7 @@ function showScreen(screenId) {
     else if (screenId === 'newspapers') renderNewspapers();
     else if (screenId === 'finances') renderFinances();
     else if (screenId === 'messages') renderMessages();
+    else if (screenId === 'inventory') renderInventory(); // Adicionado
     else if (screenId.startsWith('comp-')) {
         const compKey = screenId.substring(5); // Get comp key from id
         renderCompetitionDetails(compKey);
@@ -2197,7 +2483,8 @@ function loadGame() {
     if (savedGame) {
         gameState = JSON.parse(savedGame);
         // Add any new properties from updates here for backward compatibility
-        gameState.version = gameState.version || "8.3";
+        gameState.version = gameState.version || "8.4";
+        gameState.inventory = gameState.inventory || []; // Adicionado para compatibilidade
         gameState.transferBanSeasons = gameState.transferBanSeasons || 0;
         gameState.goals = gameState.goals || { leaguePosition: 10, wins: 15 };
         gameState.consecutiveFailures = gameState.consecutiveFailures || 0;
