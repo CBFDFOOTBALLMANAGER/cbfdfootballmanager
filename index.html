@@ -4436,6 +4436,32 @@ function generateSecretObjective() {
 <script>
     // Player Career Mode State
     let playerCareerState = {
+        narrative: {
+            reputation: 50, // 0-100
+            moralChoices: [], // histórico de escolhas
+            bannedUntil: null, // data de fim de banimento
+            relationships: {
+                partner: null,
+                children: 0,
+                friends: []
+            },
+            assets: {
+                cars: [],
+                houses: 1,
+                parties: 0,
+                scandals: 0
+            },
+            socialMedia: {
+                followers: 1000,
+                posts: [],
+                isCanceled: false
+            },
+            substances: {
+                usageCount: 0,
+                lastUsage: null,
+                banned: false
+            }
+        },
         player: {
             name: "Novo Craque",
             position: "MEI",
