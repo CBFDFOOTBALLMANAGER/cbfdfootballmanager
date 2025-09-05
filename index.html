@@ -4949,8 +4949,121 @@ function generateSecretObjective() {
     // Initialize when the page loads
     document.addEventListener('DOMContentLoaded', function() {
         initializePlayerCareer();
+        populateInitialClubDropdown();
     });
+
+    // Function to populate the initial club dropdown
+    function populateInitialClubDropdown() {
+        const dropdown = document.getElementById('player-initial-club');
+        if (dropdown) {
+            // Clear any existing options
+            dropdown.innerHTML = '';
+            
+            // Add options for each team in cbfdTeams
+            cbfdTeams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.name;
+                option.textContent = team.name;
+                dropdown.appendChild(option);
+            });
+        }
+    }
+
+    // Function to create a new player in Player Career Mode
+    function createPlayer() {
+        const name = document.getElementById('player-name').value.trim();
+        const position = document.getElementById('player-position').value;
+        const initialClub = document.getElementById('player-initial-club').value;
+        
+        if (!name) {
+            showMessage('Erro', 'Por favor, digite um nome para o jogador.');
+            return;
+        }
+        
+        if (!initialClub) {
+            showMessage('Erro', 'Por favor, selecione um clube inicial.');
+            return;
+        }
+
+        // Create player object with basic attributes
+        const player = {
+            id: gameState.nextPlayerId++,
+            name: name,
+            age: 17, // Default age
+            position: position,
+            overall: 60, // Default overall
+            potential: 85, // Default potential
+            marketValue: 100000, // Default market value
+            salary: 5000, // Default salary
+            nationality: "Brasileiro",
+            teamName: initialClub,
+            morale: 75,
+            fitness: 100,
+            suspended: 0,
+            injuryProne: false,
+            stats: { 
+                attack: position === 'ATT' ? 65 : 50,
+                defense: position === 'DEF' ? 65 : 50
+            },
+            seasonGoals: 0,
+            seasonAssists: 0,
+            seasonMatches: 0,
+            playedLastMatch: false,
+            promisedMinutes: false
+        };
+
+        // Add player to the selected team
+        const team = findTeam(initialClub);
+        if (team) {
+            team.players.push(player);
+        }
+
+        // Set as current player in career mode
+        playerCareerState.player = player;
+        
+        // Hide creation screen and show dashboard
+        document.getElementById('player-creation').classList.add('hidden');
+        document.getElementById('player-dashboard').classList.remove('hidden');
+        
+        // Update dashboard with player info
+        updatePlayerDashboard();
+        
+        showToast('Jogador criado com sucesso!');
+    }
+
+    // Function to update player dashboard with current player info
+    function updatePlayerDashboard() {
+        const player = playerCareerState.player;
+        if (!player) return;
+
+        // Update basic info
+        document.getElementById('player-name-display').textContent = player.name;
+        document.getElementById('player-position-display').textContent = player.position;
+        document.getElementById('player-age-display').textContent = player.age + ' anos';
+        document.getElementById('player-club-display').textContent = player.teamName;
+        
+        // Update stats
+        document.getElementById('player-overall-display').textContent = player.overall;
+        document.getElementById('player-morale-display').textContent = player.morale;
+        document.getElementById('player-fitness-display').textContent = player.fitness;
+        document.getElementById('player-reputation-display').textContent = '0';
+        document.getElementById('player-goals-display').textContent = player.seasonGoals;
+        document.getElementById('player-assists-display').textContent = player.seasonAssists;
+        
+        // Update progress bars
+        document.getElementById('overall-bar').style.width = player.overall + '%';
+        document.getElementById('morale-bar').style.width = player.morale + '%';
+        document.getElementById('fitness-bar').style.width = player.fitness + '%';
+        document.getElementById('reputation-bar').style.width = '0%';
+        
+        // Update avatar initials
+        const names = player.name.split(' ');
+        let initials = names[0].charAt(0);
+        if (names.length > 1) {
+            initials += names[names.length - 1].charAt(0);
+        }
+        document.getElementById('player-avatar-initials').textContent = initials;
+    }
 </script>
 </body>
 </html>
-
